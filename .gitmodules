@@ -1,3 +1,0 @@
-[submodule "external_tools/external_tools/ffxiv-datamining"]
-	path = external_tools/external_tools/ffxiv-datamining
-	url = https://github.com/xivapi/ffxiv-datamining
