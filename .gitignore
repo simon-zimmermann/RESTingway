@@ -1,1 +1,4 @@
 .venv/
+external_tools/SaintCoinach.Cmd/
+external_tools/ffxiv-teamcraft/
+__pycache__/
