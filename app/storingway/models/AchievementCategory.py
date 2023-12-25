@@ -6,11 +6,11 @@ from .AchievementKind import AchievementKind
 from .. import TableBase
 
 
-class AchievementCategory(TableBase):  # parent
+class AchievementCategory(TableBase):
     __tablename__ = "achievement_category"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column()
-    achievement_kind: Mapped[int] = mapped_column(ForeignKey("achievement_kind.id"))
+    achievement_kinda: Mapped[int] = mapped_column(ForeignKey("achievement_kind.id"))
     achievement_kind_obj: Mapped[AchievementKind] = relationship("AchievementKind")
     show_complete: Mapped[bool] = mapped_column()
     hide_category: Mapped[bool] = mapped_column()
