@@ -13,8 +13,8 @@ class AchievementTarget(TableBase):
     def to_schema(self):
         return AchievementTarget.Schema(
             id=self.id,
-            name=self.type,
-            order=self.value
+            type=self.type,
+            value=self.value
         )
 
     class Schema(BaseModel):

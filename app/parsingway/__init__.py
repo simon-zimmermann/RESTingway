@@ -8,6 +8,7 @@ from camel_converter import to_snake
 from ..storingway import get_db, models
 from ..config import config
 
+# TODO: automatically create the models in storingway/models from the csv files (create pyhton code)
 
 def parse_all():
     with open("resources/parsingway.json") as f:
