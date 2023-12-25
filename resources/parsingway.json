@@ -1,0 +1,16 @@
+{
+    "csvparser": [
+        {
+            "source_path": "AchievementKind.csv",
+            "db_model": "AchievementKind"
+        },
+        {
+            "source_path": "AchievementCategory.csv",
+            "db_model": "AchievementCategory"
+        },
+        {
+            "source_path": "AchievementTarget.csv",
+            "db_model": "AchievementTarget"
+        }
+    ]
+}

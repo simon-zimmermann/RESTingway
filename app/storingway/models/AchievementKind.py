@@ -10,12 +10,6 @@ class AchievementKind(TableBase):
     name: Mapped[str] = mapped_column()
     order: Mapped[int] = mapped_column()
 
-    def __init__(self, csv_row, **kwargs):
-        self.id = int(csv_row[0])
-        self.name = csv_row[1]
-        self.order = int(csv_row[2])
-        super(AchievementKind, self).__init__(**kwargs)
-
     def to_schema(self):
         return AchievementKind.Schema(
             id=self.id,
