@@ -1,7 +1,11 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 from . import parsingway
 from .routingway import misc_routes, raw_data
+
+# Pydantic config
+BaseModel.model_config['protected_namespaces'] = ()
 
 print("reading csv files...")
 parsingway.parse_all()

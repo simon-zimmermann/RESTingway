@@ -11,8 +11,8 @@
             "module": "uvicorn",
             "args": [
                 "app:app",
-                "--reload",
-                "--reload-exclude=app/storingway/models/"
+                //"--reload",
+                //"--reload-exclude=app/storingway/models/"
             ],
             "jinja": true,
             "justMyCode": true
