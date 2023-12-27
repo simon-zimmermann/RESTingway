@@ -1,5 +1,6 @@
 {
     "csvparser": [
+        "Quest.csv",
         "Behavior.csv",
         "Level.csv",
         "AchievementKind.csv",
@@ -25,7 +26,6 @@
         "Town.csv",
         "MonsterNote.csv",
         "Action.csv",
-        "Quest.csv",
         "MonsterNoteTarget.csv",
         "ActionCategory.csv",
         "ActionCastTimeline.csv",

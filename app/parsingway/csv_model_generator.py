@@ -1,19 +1,18 @@
 import os
 import json
-
 from ..storingway import models
 from . import csv_util
 
 
 class CSVModelGenerator():
-    empty_col_counter = 0
 
     def __init__(self, model_name: str, csv_colnames: list[str], csv_datatypes: list[str]):
         self.model_name = model_name
+        self.table_name = csv_util.to_table_name(self.model_name)
         self.csv_colnames = csv_colnames
         self.csv_datatypes = csv_datatypes
 
-    def generate(self):  # TODO retrurn a report / function to return one
+    def generate(self):
         model_fileds = ""
         schema_fields = ""
         constructor_fields = ""
@@ -50,12 +49,8 @@ class CSVModelGenerator():
         if (py_colname == "id"):
             model_field = f"    {py_colname}: Mapped[int] = mapped_column(primary_key=True, index=True)\n"
             schema_field = f"        {py_colname}: int\n"
-        # Empty column; give it a unique placeholder name, and treat it like a string
+        # Ignore columns without a name, since we can't reference them in code.
         elif (py_colname == ""):
-            py_colname = f"empty_col_{CSVModelGenerator.empty_col_counter}"
-            CSVModelGenerator.empty_col_counter += 1
-            model_field = f"    {py_colname}: Mapped[str] = mapped_column()\n"
-            schema_field = f"        {py_colname}: str\n"
             pass
         # Handle primitive types
         elif (py_datatype == "int"):
@@ -95,6 +90,7 @@ class CSVModelGenerator():
             if datatype_str not in lst:
                 print(f"Model class {model_name} does not exist.")
                 print(f"Adding {model_name}.csv to parsingway.json.")
+                print("WARNING: PLEASE RESTART PROGRAM TO LOAD NEW PARSINGWAY.JSON")
                 lst.append(datatype_str)
                 jsonfile["csvparser"] = lst
                 f.seek(0)
@@ -124,7 +120,7 @@ from .. import TableBase
 {import_string}
 
 class {self.model_name}(TableBase):
-    __tablename__ = "{csv_util.to_table_name(self.model_name)}"
+    __tablename__ = "{self.table_name}"
     __allow_unmapped__ = True
 {model_fileds}
     def __init__(self, **kwargs):

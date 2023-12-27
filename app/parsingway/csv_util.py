@@ -4,8 +4,12 @@ from camel_converter import to_snake
 
 def convert_colname(csvname: str) -> str:
     """Converts the name of a column in a csv file to a valid python variable name."""
+    # The id column is called "#"
     if csvname == "#":
         return "id"
+    # Only the id column is allowed to be called "id"
+    elif csvname.lower() == "id":
+        return "param_id"
     else:
         # Remove invalid characters
         fixed_name = re.sub('[^0-9a-zA-Z_]', '', csvname)
@@ -17,7 +21,8 @@ def convert_colname(csvname: str) -> str:
 def convert_value(python_datatype: str, value: str) -> int | bool | str:
     """Converts a string to the proper datatype. Accepts names converted by convert_datatype()."""
     if python_datatype == "int" or python_datatype == "FOREIGN_KEY":
-        value = value.replace(".", "")  # For some reason some IDs are decimal numbers. Remove the dot, should still be unique.
+        # For some reason some IDs are decimal numbers. Remove the dot, should still be unique.
+        value = value.replace(".", "")
         return int(value)
     elif python_datatype == "bool":
         return value.lower() == "true" or value == "1"

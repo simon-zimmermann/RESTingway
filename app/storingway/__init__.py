@@ -15,10 +15,6 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 TableBase = declarative_base()
 
-from . import models
-TableBase.metadata.drop_all(bind=engine)
-TableBase.metadata.create_all(bind=engine)
-
 
 def get_db():
     db = SessionLocal()

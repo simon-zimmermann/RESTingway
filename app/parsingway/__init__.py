@@ -1,5 +1,4 @@
 import csv
-from sqlalchemy.orm import Session
 import json
 import traceback
 import os
@@ -7,11 +6,12 @@ import re
 import importlib
 
 from ..config import config
-from app.storingway import models
+from app.storingway import models, TableBase, engine
 from .csv_parser import CSVParser
 
 
 def parse_all():
+    #try:
     if (config.delete_models_on_startup):
         path = models.__path__[0]
         print(f"Deleting all model files in {path}.")
@@ -19,20 +19,23 @@ def parse_all():
         for filename in files:
             if filename.endswith(".py") and filename != "__init__.py":
                 os.remove(os.path.join(path, filename))
+        if (os.path.exists("sql_app.db")):
+            os.remove("sql_app.db")
 
-    max_retries = 20
-    for i in range(max_retries):
-        with open("resources/parsingway.json") as f:
-            d = json.load(f)
-            generated_code = False
-            print(f"Starting parsingway iteration {i}")
-            for entry in d["csvparser"]:
-                parser = CSVParser(entry)
-                success = parser.parse()
-                if not success:
-                    print(f"CSVParser: failed to parse {entry}")
-                    break
-                if parser.isFileGenerated:
-                    generated_code = True
-            if not generated_code:
-                return
+    # Parse headers, create model classes
+    parser_list: list[CSVParser] = []
+    with open("resources/parsingway.json") as f:
+        d = json.load(f)
+        for entry in d["csvparser"]:
+            parser = CSVParser(entry)
+            parser.parse_header()
+            parser_list.append(parser)
+
+    TableBase.metadata.create_all(bind=engine)
+
+    for parser in parser_list:
+        parser.parse_body()
+
+    #except Exception as e:
+    #    print("error while parsing csv files. Exception is: \n%s" % e)
+    #    traceback.print_exc()

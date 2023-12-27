@@ -15,7 +15,7 @@
                 //"--reload-exclude=app/storingway/models/"
             ],
             "jinja": true,
-            "justMyCode": true
+            "justMyCode": false
         }
     ]
 }
