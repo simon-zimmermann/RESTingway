@@ -1,5 +1,7 @@
 {
     "csvparser": [
+        "Behavior.csv",
+        "Level.csv",
         "AchievementKind.csv",
         "AchievementCategory.csv",
         "AchievementTarget.csv",
@@ -42,8 +44,6 @@
         "SatisfactionNpc.csv",
         "Mount.csv",
         "DeliveryQuest.csv",
-        "Level.csv",
-        "Behavior.csv",
         "QuestRepeatFlag.csv",
         "QuestClassJobSupply.csv",
         "QuestRewardOther.csv",

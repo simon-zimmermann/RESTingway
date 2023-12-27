@@ -16,6 +16,7 @@ class CSVModelGenerator():
     def generate(self):  # TODO retrurn a report / function to return one
         model_fileds = ""
         schema_fields = ""
+        constructor_fields = ""
         import_list = []
 
         # Process each column, resulting in one field per column
@@ -24,16 +25,17 @@ class CSVModelGenerator():
             csv_datatype = self.csv_datatypes[i]
 
             # Generate fields for this column
-            (model_field, schema_field, foreign_model) = self.__generate_column(csv_colname, csv_datatype)
+            (model_field, schema_field, constructor_field, foreign_model) = self.__generate_column(csv_colname, csv_datatype)
             model_fileds += model_field
             schema_fields += schema_field
-            if foreign_model != "" and foreign_model not in import_list:
+            constructor_fields += constructor_field
+            if foreign_model != "" and foreign_model not in import_list and foreign_model != self.model_name:
                 import_list.append(foreign_model)
                 # If the foreign model does not exist, add it to parsingway.json
                 if not self.__model_file_exists(foreign_model):
                     self.__add_to_parsingway_json(foreign_model)
 
-        generated_code = self.__generate_model_code(model_fileds, schema_fields, import_list)
+        generated_code = self.__generate_model_code(model_fileds, schema_fields, constructor_fields, import_list)
         self.__save_generated_code(generated_code)
 
     def __generate_column(self, csv_colname: str, csv_datatype: str):
@@ -42,6 +44,7 @@ class CSVModelGenerator():
         model_field = ""
         schema_field = ""
         foreign_model = ""
+        constructor_field = ""
 
         # Handle special cases
         if (py_colname == "id"):
@@ -64,16 +67,19 @@ class CSVModelGenerator():
         elif (py_datatype == "str"):
             model_field = f"    {py_colname}: Mapped[str] = mapped_column()\n"
             schema_field = f"        {py_colname}: str\n"
+        elif (py_datatype == "float"):
+            model_field = f"    {py_colname}: Mapped[float] = mapped_column()\n"
+            schema_field = f"        {py_colname}: float\n"
         # Handle foreign keys
         elif (py_datatype == "FOREIGN_KEY"):
             foreign_table = csv_util.to_table_name(csv_datatype)
             foreign_model = csv_datatype
             model_field = f"    {py_colname}: Mapped[int] = mapped_column(ForeignKey(\"{foreign_table}.id\"))\n" +\
-                          f"    {py_colname}_obj: Mapped[{foreign_model}] = relationship(foreign_keys=[{foreign_table}])\n"
-            # model_fileds += f"    {colname}_obj: Mapped\n" #\"{foreign_model}\", 
+                          f"    {py_colname}_obj: Mapped\n"
+            constructor_field = f"        self.{py_colname}_obj = relationship(\"{foreign_model}\", foreign_keys=[self.{py_colname}])\n"
             schema_field = f"        {foreign_table}: {foreign_model}.Schema\n"
 
-        return (model_field, schema_field, foreign_model)
+        return (model_field, schema_field, constructor_field, foreign_model)
 
     def __model_file_exists(self, model_name: str) -> bool:
         """Checks if a file named model_name.py exists in the models folder."""
@@ -96,7 +102,7 @@ class CSVModelGenerator():
                 f.truncate()
 
     # TODO add Schema back in
-    def __generate_model_code(self, model_fileds: str, schema_fields: str, import_list: list[str]):
+    def __generate_model_code(self, model_fileds: str, schema_fields: str, constructor_fields: str, import_list: list[str]):
         # First some final post-processing
         import_string = "\n".join(
             # [f"    import app.storingway.models.{datatype} as {datatype}" for datatype in import_list])
@@ -121,6 +127,10 @@ class {self.model_name}(TableBase):
     __tablename__ = "{csv_util.to_table_name(self.model_name)}"
     __allow_unmapped__ = True
 {model_fileds}
+    def __init__(self, **kwargs):
+{constructor_fields}
+        super().__init__(**kwargs)
+
     class Schema(BaseModel):
 {schema_fields}'''
         # class Schema(BaseModel):

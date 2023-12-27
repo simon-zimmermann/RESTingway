@@ -37,7 +37,7 @@ class CSVParser:
                 self.isFileGenerated = True
                 return True
 
-            # TODO: make this work
+            # TODO: make this work. probably by using real data from the first line, or removing this check.
             # If a model class exists, check if it matches the structure of the csv file.
             model_class = getattr(imported_module, self.model_name)
             # if not self.__verify_model_class(csv_colnames, model_class):
@@ -60,7 +60,7 @@ class CSVParser:
             #       converted_value = convert_csv_datatype(datatypes[i], row[i])
             #       keydict[colnames[i]] = converted_value
             for line_keydict in self.__read_file_byline(csv_colnames, csv_datatypes):
-                print(line_keydict)
+                #print(line_keydict)
                 db_obj = model_class(**line_keydict)
                 # Actually create the ORM object, initializing it with the values from the csv file.
                 # db_obj = db_model_class(**keydict)
