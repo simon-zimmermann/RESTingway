@@ -1,5 +1,6 @@
 import os
 import csv
+import io
 from sqlalchemy.orm import Session
 from types import ModuleType
 from app.storingway import get_db
@@ -17,6 +18,8 @@ class CSVParser:
         self.csv_colnames: list[str] = []
         self.csv_datatypes: list[str] = []
         self.imported_module: bool | ModuleType = False
+        self.numGeneratedModels = 0
+        self.numAddedToParsingwayJson = 0
 
         self.__csvfile = open(self.csv_filepath, newline="", encoding="utf-8")
         self.csvreader = csv.reader(self.__csvfile, delimiter=",", quotechar="\"")
@@ -24,8 +27,8 @@ class CSVParser:
     def __del__(self):
         self.__csvfile.close()
 
-    def parse_header(self):
-        print(f"Parsing header of CSV file {self.csv_filepath}")
+    def parse_header(self, log_stream: io.StringIO):
+        print(f"Parsing header of CSV file {self.csv_filepath}", file=log_stream)
         (self.csv_colnames, self.csv_datatypes) = self.__read_header()
 
         # If debugging, it is possible to limit the number of columns added to the database, since there can be a lot.
@@ -38,14 +41,16 @@ class CSVParser:
 
         # If not, we need to generate the model class.
         if self.imported_module == False:
-            print(f"Model class {self.model_name} does not exist. Generating it.")
+            print(f"Model class {self.model_name} does not exist. Generating it.", file=log_stream)
             generator = CSVModelGenerator(self.model_name, self.csv_colnames, self.csv_datatypes)
             generator.generate()
+            self.numGeneratedModels += 1
+            self.numAddedToParsingwayJson += generator.numAddedToParsingwayJson
             # Import the newly generated model class.
             self.imported_module = util.import_if_exists(self.model_name, "app.storingway.models")
 
-    def parse_body(self):
-        print(f"Parsing body of CSV file {self.csv_filepath}")
+    def parse_body(self, log_stream: io.StringIO):
+        print(f"Parsing body of CSV file {self.csv_filepath}, adding to database.", file=log_stream)
         db: Session = next(get_db())
         if self.imported_module == False:
             raise RuntimeError(f"Model class {self.model_name} does not exist. Cannot parse body!")
@@ -59,7 +64,7 @@ class CSVParser:
             db_obj = model_class(**line_keydict)
             db.add(db_obj)
 
-            db.commit()
+        db.commit()
         db.refresh(db_obj)
 
     def __read_header(self) -> (list[str], list[str]):
@@ -78,6 +83,9 @@ class CSVParser:
 
     def __read_file_byline(self):
         for row in self.csvreader:
+            # Debug option: make it faster
+            if (config.debug_limit_db_rows > 0 and self.csvreader.line_num > config.debug_limit_db_rows):
+                break
             keydict = {}
             for i in range(len(self.csv_colnames)):
                 # ignore empty columns

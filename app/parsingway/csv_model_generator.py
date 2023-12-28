@@ -11,6 +11,7 @@ class CSVModelGenerator():
         self.table_name = csv_util.to_table_name(self.model_name)
         self.csv_colnames = csv_colnames
         self.csv_datatypes = csv_datatypes
+        self.numAddedToParsingwayJson = 0
 
     def generate(self):
         model_fileds = ""
@@ -96,6 +97,7 @@ class CSVModelGenerator():
                 f.seek(0)
                 json.dump(jsonfile, f, indent=4)
                 f.truncate()
+                self.numAddedToParsingwayJson += 1
 
     # TODO add Schema back in
     def __generate_model_code(self, model_fileds: str, schema_fields: str, constructor_fields: str, import_list: list[str]):
