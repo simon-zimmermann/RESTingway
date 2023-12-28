@@ -4,7 +4,7 @@ from datetime import datetime
 
 class BasicResponse(BaseModel):
     success: bool = Field(default=True, description="Whether the request was successful")
-    data: dict = Field(default={}, description="Additional data")
+    stats: dict = Field(default={}, description="If available, statistics about the request")
     status: str | None = Field(
         default=None,
         description="Information about the status of the request if it is not normal")
@@ -17,3 +17,9 @@ class BasicResponse(BaseModel):
 
 class LogResponse(BasicResponse):
     log: list[str] = Field(description="Output of the executed operation")
+
+
+class RawDataResponse(BasicResponse):
+    results: list[dict] = Field(description="Raw datasets directly from the database")
+    results_returned: int = Field(description="Number of datasets returned")
+    results_total: int = Field(description="Total number of datasets available")

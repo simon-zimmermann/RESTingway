@@ -63,7 +63,7 @@ class CSVParser:
             # Actually create the ORM object, initializing it with the values from the csv file.
             db_obj = model_class(**line_keydict)
             db.add(db_obj)
-
+            
         db.commit()
         db.refresh(db_obj)
 
@@ -79,6 +79,8 @@ class CSVParser:
                 continue
             raise ValueError(f"CSV file {self.csv_filepath} could not be read."
                              f"Indices not consistent. Expected {i}, got {indices[i]}")
+        # Make sure there never can be two columns with the same name.
+        colnames = csv_util.make_unique(colnames)
         return (colnames, datatypes)
 
     def __read_file_byline(self):

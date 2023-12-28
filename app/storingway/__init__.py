@@ -9,7 +9,8 @@ if os.path.exists('../sql_app.db'):
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False},
+    max_overflow=-1
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

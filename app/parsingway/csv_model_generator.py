@@ -9,6 +9,8 @@ class CSVModelGenerator():
     def __init__(self, model_name: str, csv_colnames: list[str], csv_datatypes: list[str]):
         self.model_name = model_name
         self.table_name = csv_util.to_table_name(self.model_name)
+        # make sure self.csv_colnames only contains unique values, rename duplicates
+        self.csv_colnames = csv_colnames
         self.csv_colnames = csv_colnames
         self.csv_datatypes = csv_datatypes
         self.numAddedToParsingwayJson = 0
@@ -18,6 +20,7 @@ class CSVModelGenerator():
         schema_fields = ""
         constructor_fields = ""
         import_list = []
+        to_schema_fields = ""
 
         # Process each column, resulting in one field per column
         for i in range(len(self.csv_colnames)):
@@ -25,17 +28,20 @@ class CSVModelGenerator():
             csv_datatype = self.csv_datatypes[i]
 
             # Generate fields for this column
-            (model_field, schema_field, constructor_field, foreign_model) = self.__generate_column(csv_colname, csv_datatype)
+            (model_field, schema_field, constructor_field, to_schema_field,
+             foreign_model) = self.__generate_column(csv_colname, csv_datatype)
             model_fileds += model_field
             schema_fields += schema_field
             constructor_fields += constructor_field
+            to_schema_fields += to_schema_field
             if foreign_model != "" and foreign_model not in import_list and foreign_model != self.model_name:
                 import_list.append(foreign_model)
                 # If the foreign model does not exist, add it to parsingway.json
                 if not self.__model_file_exists(foreign_model):
                     self.__add_to_parsingway_json(foreign_model)
 
-        generated_code = self.__generate_model_code(model_fileds, schema_fields, constructor_fields, import_list)
+        generated_code = self.__generate_model_code(
+            model_fileds, schema_fields, constructor_fields, to_schema_fields, import_list)
         self.__save_generated_code(generated_code)
 
     def __generate_column(self, csv_colname: str, csv_datatype: str):
@@ -45,11 +51,13 @@ class CSVModelGenerator():
         schema_field = ""
         foreign_model = ""
         constructor_field = ""
+        to_schema_field = ""
 
         # Handle special cases
         if (py_colname == "id"):
             model_field = f"    {py_colname}: Mapped[int] = mapped_column(primary_key=True, index=True)\n"
             schema_field = f"        {py_colname}: int\n"
+            to_schema_field = f"            {py_colname}=self.{py_colname},\n"
         # Ignore columns without a name, since we can't reference them in code.
         elif (py_colname == ""):
             pass
@@ -57,15 +65,19 @@ class CSVModelGenerator():
         elif (py_datatype == "int"):
             model_field = f"    {py_colname}: Mapped[int] = mapped_column()\n"
             schema_field = f"        {py_colname}: int\n"
+            to_schema_field = f"            {py_colname}=self.{py_colname},\n"
         elif (py_datatype == "bool"):
-            model_field = f"    {py_colname}: Mapped[bool] = mapped_column()\n"
+            model_field = f"    {py_colname}: Mapped[bool]=mapped_column()\n"
             schema_field = f"        {py_colname}: bool\n"
+            to_schema_field = f"            {py_colname}=self.{py_colname},\n"
         elif (py_datatype == "str"):
             model_field = f"    {py_colname}: Mapped[str] = mapped_column()\n"
             schema_field = f"        {py_colname}: str\n"
+            to_schema_field = f"            {py_colname}=self.{py_colname},\n"
         elif (py_datatype == "float"):
             model_field = f"    {py_colname}: Mapped[float] = mapped_column()\n"
             schema_field = f"        {py_colname}: float\n"
+            to_schema_field = f"            {py_colname}=self.{py_colname},\n"
         # Handle foreign keys
         elif (py_datatype == "FOREIGN_KEY"):
             foreign_table = csv_util.to_table_name(csv_datatype)
@@ -73,9 +85,10 @@ class CSVModelGenerator():
             model_field = f"    {py_colname}: Mapped[int] = mapped_column(ForeignKey(\"{foreign_table}.id\"))\n" +\
                           f"    {py_colname}_obj: Mapped\n"
             constructor_field = f"        self.{py_colname}_obj = relationship(\"{foreign_model}\", foreign_keys=[self.{py_colname}])\n"
-            schema_field = f"        {foreign_table}: {foreign_model}.Schema\n"
+            schema_field = f"        {py_colname}: int\n"
+            to_schema_field = f"            {py_colname}=self.{py_colname},\n"
 
-        return (model_field, schema_field, constructor_field, foreign_model)
+        return (model_field, schema_field, constructor_field, to_schema_field, foreign_model)
 
     def __model_file_exists(self, model_name: str) -> bool:
         """Checks if a file named model_name.py exists in the models folder."""
@@ -99,11 +112,14 @@ class CSVModelGenerator():
                 f.truncate()
                 self.numAddedToParsingwayJson += 1
 
-    # TODO add Schema back in
-    def __generate_model_code(self, model_fileds: str, schema_fields: str, constructor_fields: str, import_list: list[str]):
+    def __generate_model_code(self,
+                              model_fileds: str,
+                              schema_fields: str,
+                              constructor_fields: str,
+                              to_schema_fields: str,
+                              import_list: list[str]):
         # First some final post-processing
         import_string = "\n".join(
-            # [f"    import app.storingway.models.{datatype} as {datatype}" for datatype in import_list])
             [f"    from app.storingway.models.{datatype} import {datatype}" for datatype in import_list])
         # This is the first actually working fix for the circular import problem.
         if import_string != "":
@@ -129,10 +145,13 @@ class {self.model_name}(TableBase):
 {constructor_fields}
         super().__init__(**kwargs)
 
+    def to_schema(self) -> {self.model_name}.Schema:
+        return {self.model_name}.Schema(
+{to_schema_fields}
+        )
+
     class Schema(BaseModel):
 {schema_fields}'''
-        # class Schema(BaseModel):
-        # {schema_fields}
         return generated_code
 
     def __save_generated_code(self, generated_code: str):

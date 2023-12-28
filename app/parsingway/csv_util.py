@@ -13,8 +13,9 @@ def convert_colname(csvname: str) -> str:
     else:
         # Remove invalid characters
         fixed_name = re.sub('[^0-9a-zA-Z_]', '', csvname)
-        # Remove leading characters until we find a letter or underscore
-        fixed_name = re.sub('^[^a-zA-Z_]+', '', fixed_name)
+        # If there is a leading number, add 'param_' to the beginning
+        if fixed_name[0].isdigit():
+            fixed_name = f"param_{fixed_name}"
         return to_snake(fixed_name)
 
 
@@ -63,3 +64,20 @@ def convert_datatype(csv_datatype: str) -> str:
 def to_table_name(name: str) -> str:
     """Converts a string to a valid table name. A Table name is always in snake_case."""
     return to_snake(name)
+
+
+def make_unique(csv_colnames: list[str]) -> str:
+    """Makes sure that all column names are unique.
+    If they are not, a number is appended to the end of the name.
+    Empty names are ignored."""
+    unique_colnames = []
+    for colname in csv_colnames:
+        if (colname == ""):
+            continue
+        if colname in unique_colnames:
+            i = 1
+            while f"{colname}_{i}" in unique_colnames:
+                i += 1
+            colname = f"{colname}_{i}"
+        unique_colnames.append(colname)
+    return unique_colnames
