@@ -1,16 +1,21 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from . import parsingway
-from .routingway import misc_routes, raw_data, admin
-from app.storingway import models, TableBase, engine
+from . import util
 
 # Pydantic config
 BaseModel.model_config['protected_namespaces'] = ()
 
 print("starting FastAPI...")
 app = FastAPI()
-app.include_router(misc_routes.router)
-app.include_router(admin.router)
-raw_data.create_dynamic_routes()
-app.include_router(raw_data.router)
+
+# Only include routers for which all required modules are available.
+router_list = ["misc_routes", "raw_data", "admin"]
+for router in router_list:
+    try:
+        module = util.import_if_exists(router, "app.routingway")
+        router_obj = getattr(module, "router")
+        app.include_router(router_obj)
+    except Exception as e:
+        print(f"Failed to include router {router}: {e}")
+        pass

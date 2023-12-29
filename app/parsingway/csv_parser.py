@@ -1,13 +1,14 @@
 import os
 import csv
 import io
-from sqlalchemy.orm import Session
 from types import ModuleType
-from app.storingway import get_db
-from ..config import config
-from .csv_model_generator import CSVModelGenerator
+from sqlmodel import Session
+
 from . import csv_util
+from .csv_model_generator import CSVModelGenerator
 from .. import util
+from ..config import config
+from ..storingway import engine
 
 
 class CSVParser:
@@ -51,21 +52,22 @@ class CSVParser:
 
     def parse_body(self, log_stream: io.StringIO):
         print(f"Parsing body of CSV file {self.csv_filepath}, adding to database.", file=log_stream)
-        db: Session = next(get_db())
+        # db: Session = next(get_db())
         if self.imported_module == False:
             raise RuntimeError(f"Model class {self.model_name} does not exist. Cannot parse body!")
 
-        # For each line, build a dictionary.
-        # Keys are the column names, values are the values in the csv file.
-        for line_keydict in self.__read_file_byline():
-            # print(line_keydict)
-            model_class = getattr(self.imported_module, self.model_name)
-            # Actually create the ORM object, initializing it with the values from the csv file.
-            db_obj = model_class(**line_keydict)
-            db.add(db_obj)
-            
-        db.commit()
-        db.refresh(db_obj)
+        with Session(engine) as session:
+            # For each line, build a dictionary.
+            # Keys are the column names, values are the values in the csv file.
+            for line_keydict in self.__read_file_byline():
+                # print(line_keydict)
+                model_class = getattr(self.imported_module, self.model_name)
+                # Actually create the ORM object, initializing it with the values from the csv file.
+                db_obj = model_class(**line_keydict)
+                session.add(db_obj)
+
+            session.commit()
+            # db.refresh(db_obj)
 
     def __read_header(self) -> (list[str], list[str]):
         indices = next(self.csvreader)
@@ -96,6 +98,9 @@ class CSVParser:
                 # Convert the string into a proper datatype.
                 py_datatype = csv_util.convert_datatype(self.csv_datatypes[i])
                 py_colname = csv_util.convert_colname(self.csv_colnames[i])
+                # insert into the id columns, not the object fields. This way the forein key relationship is established.
+                if (py_datatype == "FOREIGN_KEY"):
+                    py_colname += "_id"
                 converted_value = csv_util.convert_value(py_datatype, row[i])
                 keydict[py_colname] = converted_value
             yield keydict
