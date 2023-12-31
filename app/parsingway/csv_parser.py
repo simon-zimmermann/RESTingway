@@ -3,7 +3,6 @@ import csv
 import io
 from types import ModuleType
 from sqlmodel import Session
-import shutil
 
 from . import csv_util
 from .csv_model_generator import CSVModelGenerator
@@ -13,8 +12,9 @@ from ..storingway import engine, models_generated, models
 
 
 class CSVParser:
-    def __init__(self, csv_filename: str):
+    def __init__(self, csv_filename: str, manual_fixes: list[dict]):
         self.csv_filename = csv_filename
+        self.manual_fixes = manual_fixes
         self.csv_filepath = os.path.join(config.path_gamedata_csv, csv_filename)
         self.model_name = self.csv_filename.split(".")[0]
         self.csv_colnames: list[str] = []
@@ -22,16 +22,20 @@ class CSVParser:
         self.imported_module: bool | ModuleType = False
         self.numGeneratedModels = 0
         self.numAddedToParsingwayJson = 0
+        self.rowsInserted = 0
 
-        self.__csvfile = open(self.csv_filepath, newline="", encoding="utf-8")
-        self.csvreader = csv.reader(self.__csvfile, delimiter=",", quotechar="\"")
+        self.csvfile = open(self.csv_filepath, newline="", encoding="utf-8")
+        self.csvreader = csv.reader(self.csvfile, delimiter=",", quotechar="\"")
 
     def __del__(self):
-        self.__csvfile.close()
+        self.csvfile.close()
 
-    def parse_header(self, log_stream: io.StringIO):
+    def parse_header(self, log_stream: io.StringIO) -> bool:
+        """Parses the header of the CSV file. If a matching model class exists, it is imported.
+        Returns True if a matching model class exists, False otherwise."""
         print(f"Parsing header of CSV file {self.csv_filepath}", file=log_stream)
-        (self.csv_colnames, self.csv_datatypes) = self.__read_header()
+
+        self.__read_header()
 
         # If debugging, it is possible to limit the number of columns added to the database, since there can be a lot.
         if (config.debug_limit_db_columns > 0):
@@ -41,32 +45,26 @@ class CSVParser:
         # Check whether the model has been overridden manually.
         model_manual_path = os.path.join(models.__path__[0], self.model_name + ".py")
         if os.path.exists(model_manual_path):
+            print(f"Model class {self.model_name} has been overridden manually.", file=log_stream)
             self.imported_module = util.import_if_exists(self.model_name, models.__package__)
-            if self.imported_module:
-                print(f"Model class {self.model_name} has been overridden manually.", file=log_stream)
-                return
-            else:
-                print(f"Model class {self.model_name} has been overridden manually, " +
-                      "but is not importable. Skipping it.", file=log_stream)
-                return
         else:
             self.imported_module = util.import_if_exists(self.model_name, models_generated.__package__)
 
-        # Check if the model class exists and is importable.
-        # If not, we need to generate the model class.
-        if self.imported_module == False:
-            print(f"Model class {self.model_name} does not exist. Generating it.", file=log_stream)
-            generator = CSVModelGenerator(self.model_name, self.csv_colnames, self.csv_datatypes)
-            generator.generate()
-            self.numGeneratedModels += 1
-            self.numAddedToParsingwayJson += generator.numAddedToParsingwayJson
-            # Import the newly generated model class.
-            self.imported_module = util.import_if_exists(self.model_name, models_generated.__package__)
-            return
+        return self.imported_module == True
+
+    def generate_model(self, log_stream: io.StringIO):
+        """Generates a model class for this CSV file. The resulting model class is imported."""
+        generator = CSVModelGenerator(self.model_name, self.csv_colnames, self.csv_datatypes)
+        generator.generate()
+        self.numGeneratedModels += 1
+        self.numAddedToParsingwayJson += generator.numAddedToParsingwayJson
+        # Import the newly generated model class.
+        self.imported_module = util.import_if_exists(self.model_name, models_generated.__package__)
 
     def parse_body(self, log_stream: io.StringIO):
+        """Parses the body of the CSV file, and add the data to the database."""
         print(f"Parsing body of CSV file {self.csv_filepath}, adding to database.", file=log_stream)
-        # db: Session = next(get_db())
+
         if self.imported_module == False:
             raise RuntimeError(f"Model class {self.model_name} does not exist. Cannot parse body!")
 
@@ -74,19 +72,19 @@ class CSVParser:
             # For each line, build a dictionary.
             # Keys are the column names, values are the values in the csv file.
             for line_keydict in self.__read_file_byline():
-                # print(line_keydict)
                 model_class = getattr(self.imported_module, self.model_name)
                 # Actually create the ORM object, initializing it with the values from the csv file.
                 db_obj = model_class(**line_keydict)
                 session.add(db_obj)
-
+                self.rowsInserted += 1
             session.commit()
-            # db.refresh(db_obj)
 
-    def __read_header(self) -> (list[str], list[str]):
+    def __read_header(self):
+        """Reads the first three lines of the CSV file, and returns the column names and datatypes in this file."""
         indices = next(self.csvreader)
-        colnames = next(self.csvreader)
-        datatypes = next(self.csvreader)
+        raw_colnames = next(self.csvreader)
+        raw_datatypes = next(self.csvreader)
+
         # check if indices are consistent. Failsafe for broken files.
         for i in range(len(indices)):
             if (i == 0) and ("key" in indices[i]):
@@ -95,9 +93,34 @@ class CSVParser:
                 continue
             raise ValueError(f"CSV file {self.csv_filepath} could not be read."
                              f"Indices not consistent. Expected {i}, got {indices[i]}")
-        # Make sure there never can be two columns with the same name.
-        colnames = csv_util.make_unique(colnames)
-        return (colnames, datatypes)
+
+        # Fix the colnames and datatypes
+        # Apply manual fixes
+        for i in range(len(indices)):
+            raw_cn = raw_colnames[i]
+            raw_dt = raw_datatypes[i]
+
+            # Skip names with empty names, but add them to the list of fixed names.
+            if (raw_cn == ""):
+                self.csv_colnames.append(raw_cn)
+                self.csv_datatypes.append(raw_dt)
+                continue
+
+            # Make sure each colname is unique
+            if raw_cn in self.csv_colnames:
+                repeat_cntr = 1
+                while f"{raw_cn}_{repeat_cntr}" in self.csv_colnames:
+                    i += 1
+                self.csv_colnames.append(f"{raw_cn}_{repeat_cntr}")
+            else:
+                self.csv_colnames.append(raw_cn)
+
+            # Apply manual fixes to datatypes
+            for fix in self.manual_fixes:
+                if fix["model_name"] == self.model_name and fix["old_datatype"] == raw_dt:
+                    raw_dt = fix["new_datatype"]
+                    break
+            self.csv_datatypes.append(raw_dt)
 
     def __read_file_byline(self):
         for row in self.csvreader:
@@ -110,7 +133,7 @@ class CSVParser:
                 if (self.csv_colnames[i] == ""):
                     continue
                 # Convert the string into a proper datatype.
-                py_datatype = csv_util.convert_datatype(self.csv_datatypes[i], self.model_name)
+                py_datatype = csv_util.convert_datatype(self.csv_datatypes[i])
                 py_colname = csv_util.convert_colname(self.csv_colnames[i])
                 # insert into the id columns, not the object fields. This way the forein key relationship is established.
                 if (py_datatype == "FOREIGN_KEY"):

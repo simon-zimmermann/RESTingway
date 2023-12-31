@@ -41,20 +41,10 @@ def convert_value(python_datatype: str, value: str) -> int | bool | str | None:
     else:
         return None
 
-def fix_foreign_model(foreign_model_name: str, model_name:str) -> str:
-    if model_name == "GatheringPointBase" and foreign_model_name == "Row":
-        return "GatheringItem"
-    if model_name == "GatheringItem" and foreign_model_name == "Row":
-        return "Item"
-    return foreign_model_name
 
-def convert_datatype(csv_datatype: str, model_name: str) -> str:
+def convert_datatype(csv_datatype: str) -> str:
     """Converts a datatype from the csv file to a valid python datatype.
     If the datatype is not recognized, it is assumed to be a foreign key, and return \"FOREIGN_KEY\"."""
-    if model_name == "GatheringPointBase" and csv_datatype == "Row":
-        return "FOREIGN_KEY"
-    if model_name == "GatheringItem" and csv_datatype == "Row":
-        return "FOREIGN_KEY"
     int_like = ["byte", "uint16", "uint32", "uint64", "int16", "int32", "int", "sbyte", "ubyte", "Row"]
     bool_like = ["bool"]
     # TODO int64 is supposed to be a integer, but the formatting in the csv file is strange.
@@ -76,15 +66,6 @@ def convert_datatype(csv_datatype: str, model_name: str) -> str:
     # Not in list -> probybly a reference to another table -> int
     else:
         return "FOREIGN_KEY"
-
-
-def to_table_name(name: str, model_name = "") -> str:
-    """Converts a string to a valid table name. A Table name is always in snake_case."""
-    if model_name == "GatheringPointBase" and name == "Row":
-        return "gathering_item"
-    if model_name == "GatheringItem" and name == "Row":
-        return "item"
-    return to_snake(name)
 
 
 def make_unique(csv_colnames: list[str]) -> str:

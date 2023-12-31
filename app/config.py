@@ -12,6 +12,7 @@ class Config(BaseSettings):
     debug_limit_db_rows: int = 0
     sqlite_file_name: str = "sql_app.db"
     sqlite_url: str = f"sqlite:///{sqlite_file_name}"
+    parsingway_json_filepath: str = "resources/parsingway.json"
 
 
 config = Config()

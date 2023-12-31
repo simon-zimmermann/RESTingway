@@ -7,6 +7,7 @@ from sqlalchemy import orm
 
 from .csv_parser import CSVParser
 from ..storingway import models_generated, engine
+from ..config import config
 
 
 def delete_models(log_stream: io.StringIO):
@@ -31,40 +32,47 @@ def delete_models(log_stream: io.StringIO):
     orm.clear_mappers()
 
 
-def parse_all(log_stream: io.StringIO) -> (int, int):
+def parse_all(log_stream: io.StringIO) -> (int, int, int):
     numGeneratedModels = 0
     numAddedToParsingwayJson = 0
+    rowsInserted = 0
     print("Parsing all gamedata.", file=log_stream)
-    (csv_genm, csv_addp) = parse_csv(log_stream)
+    (csv_genm, csv_addp, csv_addrow) = parse_csv(log_stream)
     numGeneratedModels += csv_genm
     numAddedToParsingwayJson += csv_addp
+    rowsInserted += csv_addrow
     print("Successfully parsed all gamedata.", file=log_stream)
-    return numGeneratedModels, numAddedToParsingwayJson
+    return numGeneratedModels, numAddedToParsingwayJson, rowsInserted
 
 
-def parse_csv(log_stream: io.StringIO) -> (int, int):
+def parse_csv(log_stream: io.StringIO) -> (int, int, int):
     print("Parsing CSV files.", file=log_stream)
     # Parse headers, create model classes. Save Parsers for later.
     parser_list: list[CSVParser] = []
     numGeneratedModels = 0
     numAddedToParsingwayJson = 0
-    with open("resources/parsingway.json") as f:
+    rowsInserted = 0
+    with open(config.parsingway_json_filepath) as f:
         d = json.load(f)
-        for entry in d["csvparser"]:
-            parser = CSVParser(entry)
-            parser.parse_header(log_stream)
+        manual_fixes: list[dict] = d["csv"]["manual_fixes"]
+        for entry in d["csv"]["files_to_parse"]:
+            parser = CSVParser(entry, manual_fixes)
             parser_list.append(parser)
-            numGeneratedModels += parser.numGeneratedModels
-            numAddedToParsingwayJson += parser.numAddedToParsingwayJson
+
+            model_exists = parser.parse_header(log_stream)
+            if not model_exists:
+                print(f"Model class {parser.model_name} does not exist. Generating it.", file=log_stream)
+                parser.generate_model(log_stream)
+                numGeneratedModels += parser.numGeneratedModels
+                numAddedToParsingwayJson += parser.numAddedToParsingwayJson
 
     # Create tables if new models were generated.
-    # TableBase.metadata.create_all(bind=engine)
-    #from ..storingway.models.GatheringPointBase import GatheringPointBase
     SQLModel.metadata.create_all(engine)
 
     # Actually read the contents of the csv files and add them to the database.
     for parser in parser_list:
         parser.parse_body(log_stream)
+        rowsInserted += parser.rowsInserted
 
     print("Successfully parsed CSV files.", file=log_stream)
-    return numGeneratedModels, numAddedToParsingwayJson
+    return numGeneratedModels, numAddedToParsingwayJson, rowsInserted
