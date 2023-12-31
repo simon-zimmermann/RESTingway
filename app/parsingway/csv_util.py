@@ -19,12 +19,19 @@ def convert_colname(csvname: str) -> str:
         return to_snake(fixed_name)
 
 
-def convert_value(python_datatype: str, value: str) -> int | bool | str:
+def convert_value(python_datatype: str, value: str) -> int | bool | str | None:
     """Converts a string to the proper datatype. Accepts names converted by convert_datatype()."""
-    if python_datatype == "int" or python_datatype == "FOREIGN_KEY":
+    if python_datatype == "int":
         # For some reason some IDs are decimal numbers. Remove the dot, should still be unique.
         value = value.replace(".", "")
         return int(value)
+    elif python_datatype == "FOREIGN_KEY":
+        # For some reason some IDs are decimal numbers. Remove the dot, should still be unique.
+        value = value.replace(".", "")
+        if value == "0":
+            return None
+        else:
+            return int(value)
     elif python_datatype == "bool":
         return value.lower() == "true" or value == "1"
     elif python_datatype == "str":
@@ -34,14 +41,24 @@ def convert_value(python_datatype: str, value: str) -> int | bool | str:
     else:
         return None
 
+def fix_foreign_model(foreign_model_name: str, model_name:str) -> str:
+    if model_name == "GatheringPointBase" and foreign_model_name == "Row":
+        return "GatheringItem"
+    if model_name == "GatheringItem" and foreign_model_name == "Row":
+        return "Item"
+    return foreign_model_name
 
-def convert_datatype(csv_datatype: str) -> str:
+def convert_datatype(csv_datatype: str, model_name: str) -> str:
     """Converts a datatype from the csv file to a valid python datatype.
     If the datatype is not recognized, it is assumed to be a foreign key, and return \"FOREIGN_KEY\"."""
-    int_like = ["byte", "uint16", "uint32", "uint64", "int16", "int32", "int", "sbyte", "ubyte"]
+    if model_name == "GatheringPointBase" and csv_datatype == "Row":
+        return "FOREIGN_KEY"
+    if model_name == "GatheringItem" and csv_datatype == "Row":
+        return "FOREIGN_KEY"
+    int_like = ["byte", "uint16", "uint32", "uint64", "int16", "int32", "int", "sbyte", "ubyte", "Row"]
     bool_like = ["bool"]
     # TODO int64 is supposed to be a integer, but the formatting in the csv file is strange.
-    str_like = ["str", "Image", "Row", "Color", "int64"]  # TODO: fix Image, Row, Color
+    str_like = ["str", "Image", "Color", "int64"]  # TODO: fix Image, Row, Color
     float_like = ["single"]
 
     # special cases
@@ -61,8 +78,12 @@ def convert_datatype(csv_datatype: str) -> str:
         return "FOREIGN_KEY"
 
 
-def to_table_name(name: str) -> str:
+def to_table_name(name: str, model_name = "") -> str:
     """Converts a string to a valid table name. A Table name is always in snake_case."""
+    if model_name == "GatheringPointBase" and name == "Row":
+        return "gathering_item"
+    if model_name == "GatheringItem" and name == "Row":
+        return "item"
     return to_snake(name)
 
 

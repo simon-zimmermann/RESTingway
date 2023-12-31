@@ -1,7 +1,7 @@
 import os
 import json
 
-from ..storingway import models
+from ..storingway import models_generated, models
 from . import csv_util
 
 
@@ -40,7 +40,7 @@ class CSVModelGenerator():
 
     def __generate_column(self, csv_colname: str, csv_datatype: str):
         py_colname = csv_util.convert_colname(csv_colname)
-        py_datatype = csv_util.convert_datatype(csv_datatype)
+        py_datatype = csv_util.convert_datatype(csv_datatype, self.model_name)
         model_field = ""
         foreign_model = ""
 
@@ -60,8 +60,8 @@ class CSVModelGenerator():
             model_field = f"    {py_colname}: float\n"
         # Handle foreign keys
         elif (py_datatype == "FOREIGN_KEY"):
-            foreign_table = csv_util.to_table_name(csv_datatype)
-            foreign_model = csv_datatype
+            foreign_table = csv_util.to_table_name(csv_datatype, self.model_name)
+            foreign_model = csv_util.fix_foreign_model(csv_datatype, self.model_name)
             model_field = f"    {py_colname}_id: Optional[int] = Field(default=None, foreign_key=\"{foreign_table}.id\")\n" +\
                           f"    {py_colname}: Optional[\"{foreign_model}\"] = " +\
                           f"Relationship(sa_relationship_kwargs={{\"foreign_keys\": \"[{self.model_name}.{py_colname}_id]\"}})\n"
@@ -70,7 +70,7 @@ class CSVModelGenerator():
 
     def __model_file_exists(self, model_name: str) -> bool:
         """Checks if a file named model_name.py exists in the models folder."""
-        return os.path.exists(os.path.join(models.__path__[0], model_name + ".py"))
+        return os.path.exists(os.path.join(models_generated.__path__[0], model_name + ".py"))
 
     def __add_to_parsingway_json(self, model_name: str):
         """Adds a model_name to parsingway.json for it to be loaded the next time."""
@@ -94,8 +94,14 @@ class CSVModelGenerator():
                               model_fields: str,
                               import_list: list[str]):
         # First some final post-processing
-        import_string = "\n".join(
-            [f"    from app.storingway.models.{datatype} import {datatype}" for datatype in import_list])
+        import_string = ""
+        for import_entry in import_list:
+            # Check if {datatype} is automatically generated or manually written
+            if hasattr(models_generated, import_entry):
+                import_string += f"    from app.storingway.models_generated.{import_entry} import {import_entry}\n"
+            else:
+                import_string += f"    from app.storingway.models.{import_entry} import {import_entry}\n"
+
         # This is the first actually working fix for the circular import problem.
         if import_string != "":
             import_string = f'''
@@ -118,6 +124,6 @@ class {self.model_name}(SQLModel, table=True):
         return generated_code
 
     def __save_generated_code(self, generated_code: str):
-        new_filename = os.path.join(models.__path__[0], self.model_name + ".py")
+        new_filename = os.path.join(models_generated.__path__[0], self.model_name + ".py")
         with open(new_filename, "w") as f:
             f.write(generated_code)

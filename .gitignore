@@ -2,5 +2,5 @@
 external_tools/SaintCoinach.Cmd/
 external_tools/ffxiv-teamcraft/
 __pycache__/
-app/storingway/models/*.py
-!app/storingway/models/__init__.py
+app/storingway/models_generated/*.py
+!app/storingway/models_generated/__init__.py

@@ -3,12 +3,13 @@ import csv
 import io
 from types import ModuleType
 from sqlmodel import Session
+import shutil
 
 from . import csv_util
 from .csv_model_generator import CSVModelGenerator
 from .. import util
 from ..config import config
-from ..storingway import engine
+from ..storingway import engine, models_generated, models
 
 
 class CSVParser:
@@ -37,9 +38,21 @@ class CSVParser:
             del self.csv_colnames[config.debug_limit_db_columns:]
             del self.csv_datatypes[config.debug_limit_db_columns:]
 
-        # Check if the model class exists and is importable.
-        self.imported_module = util.import_if_exists(self.model_name, "app.storingway.models")
+        # Check whether the model has been overridden manually.
+        model_manual_path = os.path.join(models.__path__[0], self.model_name + ".py")
+        if os.path.exists(model_manual_path):
+            self.imported_module = util.import_if_exists(self.model_name, models.__package__)
+            if self.imported_module:
+                print(f"Model class {self.model_name} has been overridden manually.", file=log_stream)
+                return
+            else:
+                print(f"Model class {self.model_name} has been overridden manually, " +
+                      "but is not importable. Skipping it.", file=log_stream)
+                return
+        else:
+            self.imported_module = util.import_if_exists(self.model_name, models_generated.__package__)
 
+        # Check if the model class exists and is importable.
         # If not, we need to generate the model class.
         if self.imported_module == False:
             print(f"Model class {self.model_name} does not exist. Generating it.", file=log_stream)
@@ -48,7 +61,8 @@ class CSVParser:
             self.numGeneratedModels += 1
             self.numAddedToParsingwayJson += generator.numAddedToParsingwayJson
             # Import the newly generated model class.
-            self.imported_module = util.import_if_exists(self.model_name, "app.storingway.models")
+            self.imported_module = util.import_if_exists(self.model_name, models_generated.__package__)
+            return
 
     def parse_body(self, log_stream: io.StringIO):
         print(f"Parsing body of CSV file {self.csv_filepath}, adding to database.", file=log_stream)
@@ -96,7 +110,7 @@ class CSVParser:
                 if (self.csv_colnames[i] == ""):
                     continue
                 # Convert the string into a proper datatype.
-                py_datatype = csv_util.convert_datatype(self.csv_datatypes[i])
+                py_datatype = csv_util.convert_datatype(self.csv_datatypes[i], self.model_name)
                 py_colname = csv_util.convert_colname(self.csv_colnames[i])
                 # insert into the id columns, not the object fields. This way the forein key relationship is established.
                 if (py_datatype == "FOREIGN_KEY"):

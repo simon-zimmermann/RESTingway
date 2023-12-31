@@ -6,7 +6,7 @@ from sqlmodel import SQLModel
 from sqlalchemy import orm
 
 from .csv_parser import CSVParser
-from ..storingway import models, engine
+from ..storingway import models_generated, engine
 
 
 def delete_models(log_stream: io.StringIO):
@@ -16,9 +16,9 @@ def delete_models(log_stream: io.StringIO):
         if module.startswith("app.storingway.models"):
             del sys.modules[module]
     # Then delete all model files
-    path = models.__path__[0]
+    path = models_generated.__path__[0]
     print(f"Deleting all model files in {path}.", file=log_stream)
-    files: list[str] = os.listdir(models.__path__[0])
+    files: list[str] = os.listdir(models_generated.__path__[0])
     for filename in files:
         if filename.endswith(".py") and filename != "__init__.py":
             os.remove(os.path.join(path, filename))
@@ -59,6 +59,7 @@ def parse_csv(log_stream: io.StringIO) -> (int, int):
 
     # Create tables if new models were generated.
     # TableBase.metadata.create_all(bind=engine)
+    #from ..storingway.models.GatheringPointBase import GatheringPointBase
     SQLModel.metadata.create_all(engine)
 
     # Actually read the contents of the csv files and add them to the database.

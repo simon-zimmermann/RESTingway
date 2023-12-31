@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import traceback
 
 from . import util
 
@@ -10,7 +11,7 @@ print("starting FastAPI...")
 app = FastAPI()
 
 # Only include routers for which all required modules are available.
-router_list = ["misc_routes", "raw_data", "admin"]
+router_list = ["misc_routes", "raw_data", "admin", "items"]
 for router in router_list:
     try:
         module = util.import_if_exists(router, "app.routingway")
@@ -18,4 +19,5 @@ for router in router_list:
         app.include_router(router_obj)
     except Exception as e:
         print(f"Failed to include router {router}: {e}")
+        traceback.print_exc()
         pass
