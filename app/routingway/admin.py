@@ -3,8 +3,9 @@ import traceback
 import io
 
 from . import responses as r
-from .. import util
-from ..parsingway import parsingway
+
+from app import util
+from app.parsingway import parsingway
 
 
 router = APIRouter(tags=["admin"])

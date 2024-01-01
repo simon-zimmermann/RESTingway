@@ -1,11 +1,9 @@
-from sqlalchemy.orm import Session
 from fastapi import APIRouter
 import pkgutil
+from sqlmodel import Session, select
 
-from .. import util
-from ..storingway import models_generated, models, engine
-from ..storingway.models_generated.AchievementCategory import AchievementCategory
-from ..storingway.models_generated.AchievementKind import AchievementKind
+from app import util
+from app.storingway import models_generated, models, engine
 
 
 router = APIRouter(tags=["raw"])
@@ -13,29 +11,13 @@ router = APIRouter(tags=["raw"])
 
 def create_routing_def(model_class: any):
     @router.get(f"/raw/{model_class.__name__}/")
-    def dynamic_raw_data(skip: int = 0, limit: int = 100) -> list[model_class]:
+    def dynamic_raw_data(offset: int = 0, limit: int = 100) -> list[model_class]:
         with Session(engine) as session:
-            data = session.query(model_class).offset(skip).limit(limit).all()
+            statement = select(model_class).offset(offset).limit(limit)
+            data = session.exec(statement).all()
             return data
 
     return dynamic_raw_data
-
-
-@router.get("/test/jointest1/")
-def dynamic_raw_data1():
-    with Session(engine) as session:
-        data = session.query(AchievementCategory).first()
-        ret = data.model_dump()
-        ret["achievement_kind"] = data.achievement_kind.model_dump()
-        return ret
-
-
-@router.get("/test/jointest2/")
-def dynamic_raw_data2():
-    with Session(engine) as session:
-        data = session.query(AchievementCategory, AchievementKind).join(AchievementKind, isouter=True).offset(5).first()
-        ret = data._asdict()
-        return ret
 
 
 def create_dynamic_routes():

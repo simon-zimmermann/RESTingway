@@ -6,9 +6,9 @@ from sqlmodel import Session
 
 from . import csv_util
 from .csv_model_generator import CSVModelGenerator
-from .. import util
-from ..config import config
-from ..storingway import engine, models_generated, models
+from app import util
+from app.config import config
+from app.storingway import engine, models_generated, models
 
 
 class CSVParser:

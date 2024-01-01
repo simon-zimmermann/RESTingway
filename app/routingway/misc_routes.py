@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from .. import config
+from app import config
 
 
 router = APIRouter(tags=["misc"])

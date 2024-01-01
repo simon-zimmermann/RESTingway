@@ -2,8 +2,9 @@ import os
 from camel_converter import to_snake
 import io
 
-from ..storingway import models_generated
 from .csv_column_generator import CSVColumnGenerator
+
+from app.storingway import models, models_generated
 
 
 class CSVModelGenerator():
@@ -50,10 +51,10 @@ class CSVModelGenerator():
         import_string = ""
         for import_entry in import_list:
             # Check if {import_entry} is automatically generated or manually written, import accordingly
-            if hasattr(models_generated, import_entry):
-                import_string += f"    from app.storingway.models_generated.{import_entry} import {import_entry}\n"
-            else:
+            if hasattr(models, import_entry):
                 import_string += f"    from app.storingway.models.{import_entry} import {import_entry}\n"
+            else:
+                import_string += f"    from app.storingway.models_generated.{import_entry} import {import_entry}\n"
 
         # Generate & save to file
         self.__generate_save_model(model_fields, import_string)

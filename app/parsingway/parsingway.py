@@ -5,9 +5,11 @@ import sys
 from sqlmodel import SQLModel
 from sqlalchemy import orm
 
+
 from .csv_parser import CSVParser
-from ..storingway import models_generated, engine
-from ..config import config
+
+from app.storingway import models_generated, engine
+from app.config import config
 
 
 def delete_models(log_stream: io.StringIO):

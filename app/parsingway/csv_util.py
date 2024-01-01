@@ -28,10 +28,10 @@ def convert_value(python_datatype: str, value: str) -> int | bool | str | None:
     elif python_datatype == "FOREIGN_KEY":
         # For some reason some IDs are decimal numbers. Remove the dot, should still be unique.
         value = value.replace(".", "")
-        if value == "0":
-            return None
-        else:
-            return int(value)
+        #if value == "0":
+        #    return None
+        #else:
+        return int(value)
     elif python_datatype == "bool":
         return value.lower() == "true" or value == "1"
     elif python_datatype == "str":

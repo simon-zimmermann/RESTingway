@@ -4,9 +4,9 @@ import io
 from camel_converter import to_snake
 
 from . import csv_util
-from ..config import config
 
-from ..storingway import models_generated
+from app.config import config
+from app.storingway import models_generated
 
 
 class CSVColumnGenerator():
