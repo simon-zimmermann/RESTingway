@@ -1,11 +1,13 @@
 from fastapi import APIRouter
 import traceback
 import io
+from sqlmodel import SQLModel, Session, delete
 
 from . import responses as r
 
 from app import util
 from app.parsingway import parsingway
+from app.storingway import engine
 
 
 router = APIRouter(tags=["admin"])
@@ -31,3 +33,11 @@ def recreate_all() -> r.LogResponse:
         return r.LogResponse(log=log_stream.getvalue().splitlines(), success=False, status=str(e))
     finally:
         log_stream.close()
+
+
+@router.patch("/admin/recreate/non_dynamic")
+def recreate_non_dynamic():
+    # TODO make this dynamic
+    from app.storingway.models.UniversalisEntry import UniversalisEntry
+    SQLModel.metadata.drop_all(engine, tables=[UniversalisEntry.__table__])
+    SQLModel.metadata.create_all(engine)

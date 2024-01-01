@@ -15,3 +15,4 @@ http://127.0.0.1:8000/docs
 
 ## Resources
 - external_tools/ffxiv-datamining/ is the result of ```git clone https://github.com/xivapi/ffxiv-datamining```
+- universalis docs: https://universalis.app/docs

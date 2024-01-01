@@ -13,9 +13,10 @@ def get_gathering_types() -> list[GatheringType]:
         return data
 
 
-def get_items_gatherable(gathering_type_id: int) -> list[Item]:
+def get_items_gatherable(gathering_type_id: int, limit: int = None) -> list[Item]:
     with Session(engine) as session:
-        data = session.exec(select(GatheringPointBase).where(GatheringPointBase.gathering_type_id == gathering_type_id)).all()
+        statement = select(GatheringPointBase).limit(limit)
+        data = session.exec(statement.where(GatheringPointBase.gathering_type_id == gathering_type_id)).all()
         all_gathering_items: list[GatheringItem] = []
         for item in data:
             if (item.item0 is not None):
