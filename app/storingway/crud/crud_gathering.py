@@ -4,19 +4,13 @@ from app.storingway import engine
 from app.storingway.models_generated.Item import Item
 from app.storingway.models_generated.GatheringItem import GatheringItem
 from app.storingway.models_generated.GatheringPointBase import GatheringPointBase
-from app.storingway.models_generated.GatheringType import GatheringType
+from app.routingway.data_enums import GatheringTypes
 
 
-def get_gathering_types() -> list[GatheringType]:
-    with Session(engine) as session:
-        data = session.exec(select(GatheringType)).all()
-        return data
-
-
-def get_items_gatherable(gathering_type_id: int, limit: int = None) -> list[Item]:
+def get_items_gatherable(gathering_type: GatheringTypes, limit: int = None) -> list[Item]:
     with Session(engine) as session:
         statement = select(GatheringPointBase).limit(limit)
-        data = session.exec(statement.where(GatheringPointBase.gathering_type_id == gathering_type_id)).all()
+        data = session.exec(statement.where(GatheringPointBase.gathering_type_id == gathering_type.name)).all()
         all_gathering_items: list[GatheringItem] = []
         for item in data:
             if (item.item0 is not None):

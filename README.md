@@ -13,6 +13,12 @@ http://127.0.0.1:8000/docs
 - python
 - FastAPI
 
+## Modules
+- parsingway: parses game data from csv files
+- routingway: all REST routes, and related operations
+- storingway: stores game data in a database, and handels all database queries
+- connectingway: connects to external services like Universalis and Lodestone
+
 ## Resources
 - external_tools/ffxiv-datamining/ is the result of ```git clone https://github.com/xivapi/ffxiv-datamining```
 - universalis docs: https://universalis.app/docs

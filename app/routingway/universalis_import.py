@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks
 import requests
 from datetime import datetime
 from statistics import median
@@ -6,9 +6,17 @@ from statistics import median
 from app.storingway.crud import crud_universalis
 from app.storingway.crud import crud_gathering
 from app.storingway.models.UniversalisEntry import UniversalisEntry
+from app.routingway.responses import BasicResponse
+from app.connectingway.universalis_cycle import refresh_universalis_data
 
 
-router = APIRouter(tags=["universalis_import"])
+router = APIRouter(tags=["universalis"])
+
+
+@router.patch("/universalis/start_cycle")
+def universalis_start_cycle(background_tasks: BackgroundTasks):
+    background_tasks.add_task(refresh_universalis_data)
+    return BasicResponse(status="Universalis refresh cycle started.")
 
 
 @router.patch("/universalis_import/full")

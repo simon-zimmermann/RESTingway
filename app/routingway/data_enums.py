@@ -1,8 +1,17 @@
 from enum import Enum
+from sqlmodel import Session, select
 
-from app.storingway.crud import crud_gathering
+from app.storingway.models_generated.GatheringType import GatheringType
+from app.storingway import engine
 
-gathering_types_dict = {str(i.id): i.name for i in crud_gathering.get_gathering_types()}
-gathering_types_dict.pop("4")  # Remove currently unused types
-gathering_types_dict.pop("5")
-GatheringTypes: Enum = Enum("GatheringTypes", gathering_types_dict)
+
+def get_gathering_types_dict() -> dict:
+    with Session(engine) as session:
+        data = session.exec(select(GatheringType)).all()
+        gathering_types_dict = {str(i.id): i.name for i in data}
+        gathering_types_dict.pop("4")  # Remove currently unused types
+        gathering_types_dict.pop("5")
+        return gathering_types_dict
+
+
+GatheringTypes: Enum = Enum("GatheringTypes", get_gathering_types_dict())
