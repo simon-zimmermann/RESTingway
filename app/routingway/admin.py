@@ -15,13 +15,13 @@ def recreate_all() -> r.LogResponse:
     log_stream = io.StringIO()
     try:
         parsingway.delete_models(log_stream)
-        (numGeneratedModels, numAddedToParsingwayJson, rowsInserted) = parsingway.parse_all(log_stream)
+        (numGeneratedModels, numAddedToParsingwayJson, rowsInserted) = parsingway.parse_csv(log_stream)
         report = {
             "numGeneratedModels": numGeneratedModels,
             "numAddedToParsingwayJson": numAddedToParsingwayJson,
             "rowsInserted": rowsInserted
         }
-        print("Recreation complete, program will be restarted in 5 sec.", file=log_stream)
+        print("Recreation complete, program will be restarted in 3 sec.", file=log_stream)
         # we need to stop the app, because sqlalchemy cant handle this
         util.stop_app(3)
         return r.LogResponse(log=log_stream.getvalue().splitlines(), report=report)

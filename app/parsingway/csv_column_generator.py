@@ -1,5 +1,6 @@
 import json
 import os
+import io
 from camel_converter import to_snake
 
 from . import csv_util
@@ -19,7 +20,7 @@ class CSVColumnGenerator():
         self.foreign_model = ""
         self.addedToParsingwayJson = False
 
-    def generate(self) -> str:
+    def generate(self, log_stream: io.StringIO) -> str:
         """Generates a model field based on the csv column name and datatype.
         Returns a string that can be written to a python model file."""
         model_field = ""
@@ -49,21 +50,19 @@ class CSVColumnGenerator():
 
             # If the foreign model does not exist, add it to parsingway.json
             if not self.__model_file_exists(self.foreign_model):
-                self.__add_to_parsingway_json(self.foreign_model)
+                self.__add_to_parsingway_json(self.foreign_model, log_stream)
 
         return model_field
 
-    def __add_to_parsingway_json(self, model_name: str):
+    def __add_to_parsingway_json(self, model_name: str, log_stream: io.StringIO):
         """Adds a model_name to parsingway.json for it to be loaded the next time."""
-        with open(config.parsingway_json_filepath, "r+") as f:
+        with open(config.filepath_parsingway_json, "r+") as f:
             jsonfile = json.load(f)
             lst: list = jsonfile["csv"]["files_to_parse"]
             datatype_str = f"{model_name}.csv"
             # Don't add duplicates
             if datatype_str not in lst:
-                print(f"Model class {model_name} does not exist.")
-                print(f"Adding {model_name}.csv to parsingway.json.")
-                print("WARNING: PLEASE RESTART PROGRAM TO LOAD NEW PARSINGWAY.JSON")
+                print(f"Adding {model_name}.csv to parsingway.json.", file=log_stream)
                 lst.append(datatype_str)
                 jsonfile["csv"]["files_to_parse"] = lst
                 f.seek(0)

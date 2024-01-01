@@ -55,7 +55,7 @@ class CSVParser:
     def generate_model(self, log_stream: io.StringIO):
         """Generates a model class for this CSV file. The resulting model class is imported."""
         generator = CSVModelGenerator(self.model_name, self.csv_colnames, self.csv_datatypes)
-        generator.generate()
+        generator.generate(log_stream)
         self.numGeneratedModels += 1
         self.numAddedToParsingwayJson += generator.numAddedToParsingwayJson
         # Import the newly generated model class.

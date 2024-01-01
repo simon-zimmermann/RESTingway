@@ -32,19 +32,6 @@ def delete_models(log_stream: io.StringIO):
     orm.clear_mappers()
 
 
-def parse_all(log_stream: io.StringIO) -> (int, int, int):
-    numGeneratedModels = 0
-    numAddedToParsingwayJson = 0
-    rowsInserted = 0
-    print("Parsing all gamedata.", file=log_stream)
-    (csv_genm, csv_addp, csv_addrow) = parse_csv(log_stream)
-    numGeneratedModels += csv_genm
-    numAddedToParsingwayJson += csv_addp
-    rowsInserted += csv_addrow
-    print("Successfully parsed all gamedata.", file=log_stream)
-    return numGeneratedModels, numAddedToParsingwayJson, rowsInserted
-
-
 def parse_csv(log_stream: io.StringIO) -> (int, int, int):
     print("Parsing CSV files.", file=log_stream)
     # Parse headers, create model classes. Save Parsers for later.
@@ -52,7 +39,7 @@ def parse_csv(log_stream: io.StringIO) -> (int, int, int):
     numGeneratedModels = 0
     numAddedToParsingwayJson = 0
     rowsInserted = 0
-    with open(config.parsingway_json_filepath) as f:
+    with open(config.filepath_parsingway_json) as f:
         d = json.load(f)
         manual_fixes: list[dict] = d["csv"]["manual_fixes"]
         for entry in d["csv"]["files_to_parse"]:
@@ -66,13 +53,17 @@ def parse_csv(log_stream: io.StringIO) -> (int, int, int):
                 numGeneratedModels += parser.numGeneratedModels
                 numAddedToParsingwayJson += parser.numAddedToParsingwayJson
 
-    # Create tables if new models were generated.
-    SQLModel.metadata.create_all(engine)
+    print("Successfully parsed headers of CSV files.", file=log_stream)
 
-    # Actually read the contents of the csv files and add them to the database.
-    for parser in parser_list:
-        parser.parse_body(log_stream)
-        rowsInserted += parser.rowsInserted
+    if numAddedToParsingwayJson > 0:
+        print("Cannot parse csv bodies, since new models have been added to parsingway.json.")
+    else:
+        # Re-create all tables to match with model definitions.
+        SQLModel.metadata.create_all(engine)
+        # Actually read the contents of the csv files and add them to the database.
+        for parser in parser_list:
+            parser.parse_body(log_stream)
+            rowsInserted += parser.rowsInserted
 
-    print("Successfully parsed CSV files.", file=log_stream)
+        print("Successfully parsed bodies of CSV files.", file=log_stream)
     return numGeneratedModels, numAddedToParsingwayJson, rowsInserted

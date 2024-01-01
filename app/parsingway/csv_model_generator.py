@@ -1,5 +1,6 @@
 import os
 from camel_converter import to_snake
+import io
 
 from ..storingway import models_generated
 from .csv_column_generator import CSVColumnGenerator
@@ -16,7 +17,7 @@ class CSVModelGenerator():
         self.csv_datatypes = csv_datatypes
         self.numAddedToParsingwayJson = 0
 
-    def generate(self):
+    def generate(self, log_stream: io.StringIO):
         """Generates a model file based on the csv column names and datatypes.
         Saves the model as a python file"""
         model_fields = ""
@@ -33,7 +34,7 @@ class CSVModelGenerator():
 
             # Generate fields for this column
             col_gen = CSVColumnGenerator(self.model_name, csv_colname, csv_datatype)
-            model_fields += col_gen.generate()
+            model_fields += col_gen.generate(log_stream)
 
             # Check if we need to add an import
             if col_gen.foreign_model != "" \
