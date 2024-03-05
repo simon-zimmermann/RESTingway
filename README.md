@@ -16,5 +16,5 @@ http://127.0.0.1:8000/docs
 
 
 ## Resources
-- gamedata/ffxiv-datamining/ is the result of ```git clone https://github.com/xivapi/ffxiv-datamining```
+- gamedata/ffxiv-datamining/ is the result of ```git submodule add https://github.com/xivapi/ffxiv-datamining gamedata/ffxiv-datamining ```
 - universalis docs: https://universalis.app/docs
