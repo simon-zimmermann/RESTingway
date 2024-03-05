@@ -2,8 +2,8 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.Map import Map
-    from app.storingway.models_generated.TerritoryType import TerritoryType
+    from db.models_generated.Map import Map
+    from db.models_generated.TerritoryType import TerritoryType
 
 
 class Level(SQLModel, table=True):

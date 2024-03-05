@@ -2,11 +2,11 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.ActionTimeline import ActionTimeline
-    from app.storingway.models_generated.EmoteCategory import EmoteCategory
-    from app.storingway.models_generated.EmoteMode import EmoteMode
-    from app.storingway.models_generated.TextCommand import TextCommand
-    from app.storingway.models_generated.LogMessage import LogMessage
+    from db.models_generated.ActionTimeline import ActionTimeline
+    from db.models_generated.EmoteCategory import EmoteCategory
+    from db.models_generated.EmoteMode import EmoteMode
+    from db.models_generated.TextCommand import TextCommand
+    from db.models_generated.LogMessage import LogMessage
 
 
 class Emote(SQLModel, table=True):

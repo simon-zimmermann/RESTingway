@@ -2,11 +2,11 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.AchievementCategory import AchievementCategory
-    from app.storingway.models_generated.AchievementTarget import AchievementTarget
-    from app.storingway.models_generated.Title import Title
-    from app.storingway.models_generated.Item import Item
-    from app.storingway.models_generated.AchievementHideCondition import AchievementHideCondition
+    from db.models_generated.AchievementCategory import AchievementCategory
+    from db.models_generated.AchievementTarget import AchievementTarget
+    from db.models_generated.Title import Title
+    from db.models_generated.Item import Item
+    from db.models_generated.AchievementHideCondition import AchievementHideCondition
 
 
 class Achievement(SQLModel, table=True):

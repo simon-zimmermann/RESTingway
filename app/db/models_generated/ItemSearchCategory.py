@@ -2,7 +2,7 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.ClassJob import ClassJob
+    from db.models_generated.ClassJob import ClassJob
 
 
 class ItemSearchCategory(SQLModel, table=True):

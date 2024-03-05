@@ -20,5 +20,5 @@ http://127.0.0.1:8000/docs
 - connectingway: connects to external services like Universalis and Lodestone
 
 ## Resources
-- external_tools/ffxiv-datamining/ is the result of ```git clone https://github.com/xivapi/ffxiv-datamining```
+- gamedata/ffxiv-datamining/ is the result of ```git clone https://github.com/xivapi/ffxiv-datamining```
 - universalis docs: https://universalis.app/docs

@@ -2,8 +2,8 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.Race import Race
-    from app.storingway.models_generated.Tribe import Tribe
+    from db.models_generated.Race import Race
+    from db.models_generated.Tribe import Tribe
 
 
 class BNpcCustomize(SQLModel, table=True):

@@ -2,7 +2,7 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.ScreenImage import ScreenImage
+    from db.models_generated.ScreenImage import ScreenImage
 
 
 class ExVersion(SQLModel, table=True):

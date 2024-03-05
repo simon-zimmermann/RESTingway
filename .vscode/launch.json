@@ -7,7 +7,7 @@
         
         {
             "name": "Universalis Scraper",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "app",
             "args": ["scraper"],
@@ -15,7 +15,7 @@
         },
         {
             "name": "calc_test",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "app",
             "args": ["calc_test"],
@@ -23,7 +23,7 @@
         },
         {
             "name": "Gamedata parser",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "app",
             "args": ["parser"],
@@ -31,11 +31,11 @@
         },
         {
             "name": "Python: FastAPI",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "app:app",
+                "app:rest_app",
                 //"--reload",
                 //"--reload-exclude=app/storingway/models/"
             ],

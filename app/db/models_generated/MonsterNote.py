@@ -2,7 +2,7 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.MonsterNoteTarget import MonsterNoteTarget
+    from db.models_generated.MonsterNoteTarget import MonsterNoteTarget
 
 
 class MonsterNote(SQLModel, table=True):

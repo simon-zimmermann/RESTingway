@@ -4,7 +4,7 @@ import io
 
 from .csv_column_generator import CSVColumnGenerator
 
-from db import models, models_generated
+from app.db import models, models_generated
 
 
 class CSVModelGenerator():
@@ -16,7 +16,7 @@ class CSVModelGenerator():
         self.csv_colnames = csv_colnames
         self.csv_colnames = csv_colnames
         self.csv_datatypes = csv_datatypes
-        self.numAddedToParsingwayJson = 0
+        self.numAddedToJsonConfig = 0
 
     def generate(self, log_stream: io.StringIO):
         """Generates a model file based on the csv column names and datatypes.
@@ -44,8 +44,8 @@ class CSVModelGenerator():
                 import_list.append(col_gen.foreign_model)
 
             # Stats
-            if col_gen.addedToParsingwayJson:
-                self.numAddedToParsingwayJson += 1
+            if col_gen.addedToJson:
+                self.numAddedToJsonConfig += 1
 
         # Concat import list
         import_string = ""
@@ -57,9 +57,9 @@ class CSVModelGenerator():
                 import_string += f"    from db.models_generated.{import_entry} import {import_entry}\n"
 
         # Generate & save to file
-        self.__generate_save_model(model_fields, import_string)
+        self.__generate_save_model(model_fields, import_string, log_stream)
 
-    def __generate_save_model(self, model_fields: str, import_string: str):
+    def __generate_save_model(self, model_fields: str, import_string: str, log_stream: io.StringIO):
         # If we have imports, generate an import block
         # To fix circular imports, imports are only valid while type checking
         import_block = ""
@@ -79,6 +79,6 @@ class {self.model_name}(SQLModel, table=True):
 '''
         # Save to file
         new_filename = os.path.join(models_generated.__path__[0], self.model_name + ".py")
-        print(f"Saving model file {new_filename}")
+        print(f"Saving model file {new_filename}", file=log_stream)
         with open(new_filename, "w") as f:
             f.write(generated_code)

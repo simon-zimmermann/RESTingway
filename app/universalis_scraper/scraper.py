@@ -2,9 +2,9 @@ import requests
 from datetime import datetime
 from sqlmodel import Session, select
 
-from common import config
-from db import engine
-from db.models.UniversalisEntry import UniversalisEntry
+from app.common import config
+from app.db import engine
+from app.db.models.UniversalisEntry import UniversalisEntry
 
 
 def get_by_item(item_id: int) -> list[UniversalisEntry]:
@@ -58,8 +58,12 @@ def refresh_universalis_data():
     limit = config.debug_limit_universalis_scraper
     count = len(all_itemids) if limit == 0 else limit
     print(f"requesting data for {count} items from universalis")
-    for i in range(count):
-        item_id = all_itemids[i]
-        if i % 10 == 0:
-            print(f"requested data for {i} out of {count} items from universalis")
-        refresh_single_item(item_id)
+    try:
+        for i in range(count):
+            item_id = all_itemids[i]
+            if i % 10 == 0:
+                print(f"requested data for {i} out of {count} items from universalis")
+            refresh_single_item(item_id)
+    except Exception as e:
+        print(f"error while requesting data from universalis: {e}")
+        pass

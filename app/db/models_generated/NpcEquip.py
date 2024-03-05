@@ -2,7 +2,7 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.Stain import Stain
+    from db.models_generated.Stain import Stain
 
 
 class NpcEquip(SQLModel, table=True):

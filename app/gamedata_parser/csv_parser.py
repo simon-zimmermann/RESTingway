@@ -7,9 +7,9 @@ from sqlmodel import Session
 from . import csv_util
 from .csv_model_generator import CSVModelGenerator
 
-from common import util
-from common import config
-from db import engine, models_generated, models
+from app.common import util
+from app.common import config
+from app.db import engine, models_generated, models
 
 
 class CSVParser:
@@ -22,7 +22,7 @@ class CSVParser:
         self.csv_datatypes: list[str] = []
         self.imported_module: bool | ModuleType = False
         self.numGeneratedModels = 0
-        self.numAddedToParsingwayJson = 0
+        self.numAddedToJsonConfig = 0
         self.rowsInserted = 0
 
         self.csvfile = open(self.csv_filepath, newline="", encoding="utf-8")
@@ -51,14 +51,14 @@ class CSVParser:
         else:
             self.imported_module = util.import_if_exists(self.model_name, models_generated.__package__)
 
-        return self.imported_module == True
+        return self.imported_module is not False
 
     def generate_model(self, log_stream: io.StringIO):
         """Generates a model class for this CSV file. The resulting model class is imported."""
         generator = CSVModelGenerator(self.model_name, self.csv_colnames, self.csv_datatypes)
         generator.generate(log_stream)
         self.numGeneratedModels += 1
-        self.numAddedToParsingwayJson += generator.numAddedToParsingwayJson
+        self.numAddedToJsonConfig += generator.numAddedToJsonConfig
         # Import the newly generated model class.
         self.imported_module = util.import_if_exists(self.model_name, models_generated.__package__)
 
@@ -74,10 +74,13 @@ class CSVParser:
             # Keys are the column names, values are the values in the csv file.
             for line_keydict in self.__read_file_byline():
                 model_class = getattr(self.imported_module, self.model_name)
-                # Actually create the ORM object, initializing it with the values from the csv file.
-                db_obj = model_class(**line_keydict)
-                session.add(db_obj)
-                self.rowsInserted += 1
+
+                # Only insert lines that are not already in the database.
+                if session.get(model_class, line_keydict["id"]) is None:
+                    # Actually create the ORM object, initializing it with the values from the csv file.
+                    db_obj = model_class(**line_keydict)
+                    session.add(db_obj)
+                    self.rowsInserted += 1
             session.commit()
 
     def __read_header(self):

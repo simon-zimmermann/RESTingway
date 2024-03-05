@@ -2,16 +2,16 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.ActionCategory import ActionCategory
-    from app.storingway.models_generated.ActionCastTimeline import ActionCastTimeline
-    from app.storingway.models_generated.ActionCastVFX import ActionCastVFX
-    from app.storingway.models_generated.ActionTimeline import ActionTimeline
-    from app.storingway.models_generated.ClassJob import ClassJob
-    from app.storingway.models_generated.AttackType import AttackType
-    from app.storingway.models_generated.ActionProcStatus import ActionProcStatus
-    from app.storingway.models_generated.Status import Status
-    from app.storingway.models_generated.ClassJobCategory import ClassJobCategory
-    from app.storingway.models_generated.Omen import Omen
+    from db.models_generated.ActionCategory import ActionCategory
+    from db.models_generated.ActionCastTimeline import ActionCastTimeline
+    from db.models_generated.ActionCastVFX import ActionCastVFX
+    from db.models_generated.ActionTimeline import ActionTimeline
+    from db.models_generated.ClassJob import ClassJob
+    from db.models_generated.AttackType import AttackType
+    from db.models_generated.ActionProcStatus import ActionProcStatus
+    from db.models_generated.Status import Status
+    from db.models_generated.ClassJobCategory import ClassJobCategory
+    from db.models_generated.Omen import Omen
 
 
 class Action(SQLModel, table=True):

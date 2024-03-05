@@ -2,19 +2,19 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.ItemLevel import ItemLevel
-    from app.storingway.models_generated.ItemUICategory import ItemUICategory
-    from app.storingway.models_generated.ItemSearchCategory import ItemSearchCategory
-    from app.storingway.models_generated.EquipSlotCategory import EquipSlotCategory
-    from app.storingway.models_generated.ItemSortCategory import ItemSortCategory
-    from app.storingway.models_generated.ItemAction import ItemAction
-    from app.storingway.models_generated.ClassJob import ClassJob
-    from app.storingway.models_generated.ItemRepairResource import ItemRepairResource
-    from app.storingway.models_generated.ClassJobCategory import ClassJobCategory
-    from app.storingway.models_generated.GrandCompany import GrandCompany
-    from app.storingway.models_generated.ItemSeries import ItemSeries
-    from app.storingway.models_generated.BaseParam import BaseParam
-    from app.storingway.models_generated.ItemSpecialBonus import ItemSpecialBonus
+    from db.models_generated.ItemLevel import ItemLevel
+    from db.models_generated.ItemUICategory import ItemUICategory
+    from db.models_generated.ItemSearchCategory import ItemSearchCategory
+    from db.models_generated.EquipSlotCategory import EquipSlotCategory
+    from db.models_generated.ItemSortCategory import ItemSortCategory
+    from db.models_generated.ItemAction import ItemAction
+    from db.models_generated.ClassJob import ClassJob
+    from db.models_generated.ItemRepairResource import ItemRepairResource
+    from db.models_generated.ClassJobCategory import ClassJobCategory
+    from db.models_generated.GrandCompany import GrandCompany
+    from db.models_generated.ItemSeries import ItemSeries
+    from db.models_generated.BaseParam import BaseParam
+    from db.models_generated.ItemSpecialBonus import ItemSpecialBonus
 
 
 class Item(SQLModel, table=True):

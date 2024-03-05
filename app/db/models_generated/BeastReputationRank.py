@@ -2,7 +2,7 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.UIColor import UIColor
+    from db.models_generated.UIColor import UIColor
 
 
 class BeastReputationRank(SQLModel, table=True):

@@ -2,9 +2,9 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.BeastRankBonus import BeastRankBonus
-    from app.storingway.models_generated.ExVersion import ExVersion
-    from app.storingway.models_generated.Item import Item
+    from db.models_generated.BeastRankBonus import BeastRankBonus
+    from db.models_generated.ExVersion import ExVersion
+    from db.models_generated.Item import Item
 
 
 class BeastTribe(SQLModel, table=True):

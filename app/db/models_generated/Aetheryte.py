@@ -2,11 +2,11 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.PlaceName import PlaceName
-    from app.storingway.models_generated.TerritoryType import TerritoryType
-    from app.storingway.models_generated.Level import Level
-    from app.storingway.models_generated.Quest import Quest
-    from app.storingway.models_generated.Map import Map
+    from db.models_generated.PlaceName import PlaceName
+    from db.models_generated.TerritoryType import TerritoryType
+    from db.models_generated.Level import Level
+    from db.models_generated.Quest import Quest
+    from db.models_generated.Map import Map
 
 
 class Aetheryte(SQLModel, table=True):

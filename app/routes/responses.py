@@ -4,7 +4,7 @@ from datetime import datetime
 
 class BasicResponse(BaseModel):
     success: bool = Field(default=True, description="Whether the request was successful")
-    report: dict = Field(default={}, description="If available, a report about the request")
+    report: dict | list = Field(default={}, description="If available, a report about the request")
     status: str | None = Field(
         default=None,
         description="Information about the status of the request if it is not normal")

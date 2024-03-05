@@ -1,11 +1,11 @@
 from enum import Enum
 from sqlmodel import Session, select
 
-from db.models_generated.GatheringType import GatheringType
-from db.models_generated.GatheringPointBase import GatheringPointBase
-from db.models_generated.GatheringItem import GatheringItem
-from db.models_generated.Item import Item
-from db import engine
+from app.db.models_generated.GatheringType import GatheringType
+from app.db.models_generated.GatheringPointBase import GatheringPointBase
+from app.db.models_generated.GatheringItem import GatheringItem
+from app.db.models_generated.Item import Item
+from app.db import engine
 
 
 def get_gathering_types_dict() -> dict:

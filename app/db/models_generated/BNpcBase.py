@@ -2,14 +2,14 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.Behavior import Behavior
-    from app.storingway.models_generated.Battalion import Battalion
-    from app.storingway.models_generated.LinkRace import LinkRace
-    from app.storingway.models_generated.ModelChara import ModelChara
-    from app.storingway.models_generated.BNpcCustomize import BNpcCustomize
-    from app.storingway.models_generated.NpcEquip import NpcEquip
-    from app.storingway.models_generated.ArrayEventHandler import ArrayEventHandler
-    from app.storingway.models_generated.BNpcParts import BNpcParts
+    from db.models_generated.Behavior import Behavior
+    from db.models_generated.Battalion import Battalion
+    from db.models_generated.LinkRace import LinkRace
+    from db.models_generated.ModelChara import ModelChara
+    from db.models_generated.BNpcCustomize import BNpcCustomize
+    from db.models_generated.NpcEquip import NpcEquip
+    from db.models_generated.ArrayEventHandler import ArrayEventHandler
+    from db.models_generated.BNpcParts import BNpcParts
 
 
 class BNpcBase(SQLModel, table=True):

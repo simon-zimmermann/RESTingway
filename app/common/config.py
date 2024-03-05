@@ -9,7 +9,7 @@ class Config(BaseSettings):
     debug_limit_universalis_scraper: int = 0
     db_url: str = "sqlite:///resources/RESTingway.db"
     # db_url: str = "mariadb+mariadbconnector://root@localhost:3306/restingway"
-    filepath_parsingway_json: str = "resources/parsingway.json"
+    filepath_gamedata_parser_json: str = "resources/gamedata_parser.json"
 
 
 config = Config()

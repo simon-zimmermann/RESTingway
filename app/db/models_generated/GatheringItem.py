@@ -2,9 +2,9 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.Item import Item
-    from app.storingway.models_generated.GatheringItemLevelConvertTable import GatheringItemLevelConvertTable
-    from app.storingway.models_generated.Quest import Quest
+    from db.models_generated.Item import Item
+    from db.models_generated.GatheringItemLevelConvertTable import GatheringItemLevelConvertTable
+    from db.models_generated.Quest import Quest
 
 
 class GatheringItem(SQLModel, table=True):

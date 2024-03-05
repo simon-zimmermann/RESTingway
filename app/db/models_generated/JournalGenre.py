@@ -2,7 +2,7 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.JournalCategory import JournalCategory
+    from db.models_generated.JournalCategory import JournalCategory
 
 
 class JournalGenre(SQLModel, table=True):

@@ -2,9 +2,9 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.ClassJobCategory import ClassJobCategory
-    from app.storingway.models_generated.StatusHitEffect import StatusHitEffect
-    from app.storingway.models_generated.StatusLoopVFX import StatusLoopVFX
+    from db.models_generated.ClassJobCategory import ClassJobCategory
+    from db.models_generated.StatusHitEffect import StatusHitEffect
+    from db.models_generated.StatusLoopVFX import StatusLoopVFX
 
 
 class Status(SQLModel, table=True):

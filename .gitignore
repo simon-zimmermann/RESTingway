@@ -1,7 +1,5 @@
-.venv/
-external_tools/SaintCoinach.Cmd/
-external_tools/ffxiv-teamcraft/
+/.venv/
 __pycache__/
-db/models_generated/*.py
-!db/models_generated/__init__.py
-resources/RESTingway.db
+/app/db/models_generated/*.py
+!/app/db/models_generated/__init__.py
+/resources/RESTingway.db

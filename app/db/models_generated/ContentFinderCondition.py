@@ -2,11 +2,11 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.TerritoryType import TerritoryType
-    from app.storingway.models_generated.ClassJobCategory import ClassJobCategory
-    from app.storingway.models_generated.ContentMemberType import ContentMemberType
-    from app.storingway.models_generated.Quest import Quest
-    from app.storingway.models_generated.ContentType import ContentType
+    from db.models_generated.TerritoryType import TerritoryType
+    from db.models_generated.ClassJobCategory import ClassJobCategory
+    from db.models_generated.ContentMemberType import ContentMemberType
+    from db.models_generated.Quest import Quest
+    from db.models_generated.ContentType import ContentType
 
 
 class ContentFinderCondition(SQLModel, table=True):

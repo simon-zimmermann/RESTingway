@@ -2,15 +2,15 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.PlaceName import PlaceName
-    from app.storingway.models_generated.Map import Map
-    from app.storingway.models_generated.LoadingImage import LoadingImage
-    from app.storingway.models_generated.ContentFinderCondition import ContentFinderCondition
-    from app.storingway.models_generated.ArrayEventHandler import ArrayEventHandler
-    from app.storingway.models_generated.QuestBattle import QuestBattle
-    from app.storingway.models_generated.Aetheryte import Aetheryte
-    from app.storingway.models_generated.ExVersion import ExVersion
-    from app.storingway.models_generated.MountSpeed import MountSpeed
+    from db.models_generated.PlaceName import PlaceName
+    from db.models_generated.Map import Map
+    from db.models_generated.LoadingImage import LoadingImage
+    from db.models_generated.ContentFinderCondition import ContentFinderCondition
+    from db.models_generated.ArrayEventHandler import ArrayEventHandler
+    from db.models_generated.QuestBattle import QuestBattle
+    from db.models_generated.Aetheryte import Aetheryte
+    from db.models_generated.ExVersion import ExVersion
+    from db.models_generated.MountSpeed import MountSpeed
 
 
 class TerritoryType(SQLModel, table=True):

@@ -2,11 +2,11 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.ModelChara import ModelChara
-    from app.storingway.models_generated.MountFlyingCondition import MountFlyingCondition
-    from app.storingway.models_generated.MountCustomize import MountCustomize
-    from app.storingway.models_generated.BGM import BGM
-    from app.storingway.models_generated.MountAction import MountAction
+    from db.models_generated.ModelChara import ModelChara
+    from db.models_generated.MountFlyingCondition import MountFlyingCondition
+    from db.models_generated.MountCustomize import MountCustomize
+    from db.models_generated.BGM import BGM
+    from db.models_generated.MountAction import MountAction
 
 
 class Mount(SQLModel, table=True):

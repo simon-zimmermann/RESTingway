@@ -1,11 +1,10 @@
 from sqlmodel import Session, select
 from statistics import median
-import json
 
-from db.models.UniversalisEntry import UniversalisEntry
-from db.models_generated.Item import Item
-from db.util import gathering
-from db import engine
+from app.db.models.UniversalisEntry import UniversalisEntry
+from app.db.models_generated.Item import Item
+from app.db.crud import gathering
+from app.db import engine
 
 
 def get_by_item(item_id: int) -> list[UniversalisEntry]:
@@ -105,17 +104,11 @@ def get_all(items: list[Item]):
     return ret
 
 
-def print_test_results():
-    # with Session(engine) as session:
-    #    statement = select(Item).join(UniversalisEntry.item).group_by(UniversalisEntry.item_id).limit(10)
-    #    items = session.exec(statement).all()
-    #    averages = get_all(items)
-    #    print(json.dumps(averages, indent=4))
+def test_average_calc() -> list[dict]:
     itemlist = gathering.get_gatherable_all()
     prices = get_all(itemlist)
     sorted_prices = sorted(prices, key=lambda x: x["minimum"], reverse=True)
     sorted_prices = sorted_prices[:10]
     for entry in sorted_prices:
         entry.pop("item")
-    json_str = json.dumps(sorted_prices, indent=4)
-    print(json_str)
+    return sorted_prices

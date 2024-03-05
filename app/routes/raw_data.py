@@ -2,8 +2,8 @@ from fastapi import APIRouter
 import pkgutil
 from sqlmodel import Session, select
 
-from app import util
-from app.storingway import models_generated, models, engine
+from app.common import util
+from app.db import models_generated, models, engine
 
 
 router = APIRouter(tags=["raw"])

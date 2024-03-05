@@ -2,9 +2,9 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.ENpcResident import ENpcResident
-    from app.storingway.models_generated.Quest import Quest
-    from app.storingway.models_generated.Item import Item
+    from db.models_generated.ENpcResident import ENpcResident
+    from db.models_generated.Quest import Quest
+    from db.models_generated.Item import Item
 
 
 class SatisfactionNpc(SQLModel, table=True):

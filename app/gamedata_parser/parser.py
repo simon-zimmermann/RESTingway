@@ -3,16 +3,15 @@ import os
 import io
 import sys
 from sqlmodel import SQLModel
-from sqlalchemy import orm
 
 
 from .csv_parser import CSVParser
 
-from db import models_generated, engine
-from common import config
+from app.db import models_generated, engine
+from app.common import config
 
 
-def delete_models(log_stream: io.StringIO):
+def delete_generated_models(log_stream: io.StringIO):
     # First unload all modules
     print("Unloading all model modules.", file=log_stream)
     for module in list(sys.modules.keys()):
@@ -26,22 +25,15 @@ def delete_models(log_stream: io.StringIO):
         if filename.endswith(".py") and filename != "__init__.py":
             os.remove(os.path.join(path, filename))
 
-    # Then delete all tables, and remove any references to them.
-    # This is enough to re-create and re-import the tables/data, but the program still needs to be restarted.
-    print("Deleting all tables, and removing all references, mappers and registries.", file=log_stream)
-    SQLModel.metadata.drop_all(engine)
-    SQLModel.metadata.clear()
-    orm.clear_mappers()
-
 
 def parse_csv(log_stream: io.StringIO) -> (int, int, int):
     print("Parsing CSV files.", file=log_stream)
     # Parse headers, create model classes. Save Parsers for later.
     parser_list: list[CSVParser] = []
     numGeneratedModels = 0
-    numAddedToParsingwayJson = 0
+    numAddedToJsonConfig = 0
     rowsInserted = 0
-    with open(config.filepath_parsingway_json) as f:
+    with open(config.filepath_gamedata_parser_json) as f:
         d = json.load(f)
         manual_fixes: list[dict] = d["csv"]["manual_fixes"]
         for entry in d["csv"]["files_to_parse"]:
@@ -53,12 +45,12 @@ def parse_csv(log_stream: io.StringIO) -> (int, int, int):
                 print(f"Model class {parser.model_name} does not exist. Generating it.", file=log_stream)
                 parser.generate_model(log_stream)
                 numGeneratedModels += parser.numGeneratedModels
-                numAddedToParsingwayJson += parser.numAddedToParsingwayJson
+                numAddedToJsonConfig += parser.numAddedToJsonConfig
 
     print("Successfully parsed headers of CSV files.", file=log_stream)
 
-    if numAddedToParsingwayJson > 0:
-        print("Cannot parse csv bodies, since new models have been added to parsingway.json.")
+    if numAddedToJsonConfig > 0:
+        print("Cannot parse csv bodies, since new models have been added to gamedata_parser.json.")
     else:
         # Re-create all tables to match with model definitions.
         SQLModel.metadata.create_all(engine)
@@ -68,4 +60,4 @@ def parse_csv(log_stream: io.StringIO) -> (int, int, int):
             rowsInserted += parser.rowsInserted
 
         print("Successfully parsed bodies of CSV files.", file=log_stream)
-    return numGeneratedModels, numAddedToParsingwayJson, rowsInserted
+    return numGeneratedModels, numAddedToJsonConfig, rowsInserted

@@ -2,9 +2,9 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.BNpcName import BNpcName
-    from app.storingway.models_generated.Town import Town
-    from app.storingway.models_generated.PlaceName import PlaceName
+    from db.models_generated.BNpcName import BNpcName
+    from db.models_generated.Town import Town
+    from db.models_generated.PlaceName import PlaceName
 
 
 class MonsterNoteTarget(SQLModel, table=True):

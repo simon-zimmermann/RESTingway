@@ -2,9 +2,9 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.MapCondition import MapCondition
-    from app.storingway.models_generated.PlaceName import PlaceName
-    from app.storingway.models_generated.TerritoryType import TerritoryType
+    from db.models_generated.MapCondition import MapCondition
+    from db.models_generated.PlaceName import PlaceName
+    from db.models_generated.TerritoryType import TerritoryType
 
 
 class Map(SQLModel, table=True):

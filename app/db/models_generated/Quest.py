@@ -2,31 +2,31 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.ExVersion import ExVersion
-    from app.storingway.models_generated.ClassJobCategory import ClassJobCategory
-    from app.storingway.models_generated.ClassJob import ClassJob
-    from app.storingway.models_generated.GrandCompany import GrandCompany
-    from app.storingway.models_generated.GrandCompanyRank import GrandCompanyRank
-    from app.storingway.models_generated.InstanceContent import InstanceContent
-    from app.storingway.models_generated.Festival import Festival
-    from app.storingway.models_generated.BeastTribe import BeastTribe
-    from app.storingway.models_generated.BeastReputationRank import BeastReputationRank
-    from app.storingway.models_generated.SatisfactionNpc import SatisfactionNpc
-    from app.storingway.models_generated.Mount import Mount
-    from app.storingway.models_generated.DeliveryQuest import DeliveryQuest
-    from app.storingway.models_generated.Level import Level
-    from app.storingway.models_generated.Behavior import Behavior
-    from app.storingway.models_generated.QuestRepeatFlag import QuestRepeatFlag
-    from app.storingway.models_generated.QuestClassJobSupply import QuestClassJobSupply
-    from app.storingway.models_generated.QuestRewardOther import QuestRewardOther
-    from app.storingway.models_generated.Item import Item
-    from app.storingway.models_generated.Stain import Stain
-    from app.storingway.models_generated.Emote import Emote
-    from app.storingway.models_generated.Action import Action
-    from app.storingway.models_generated.GeneralAction import GeneralAction
-    from app.storingway.models_generated.PlaceName import PlaceName
-    from app.storingway.models_generated.JournalGenre import JournalGenre
-    from app.storingway.models_generated.EventIconType import EventIconType
+    from db.models_generated.ExVersion import ExVersion
+    from db.models_generated.ClassJobCategory import ClassJobCategory
+    from db.models_generated.ClassJob import ClassJob
+    from db.models_generated.GrandCompany import GrandCompany
+    from db.models_generated.GrandCompanyRank import GrandCompanyRank
+    from db.models_generated.InstanceContent import InstanceContent
+    from db.models_generated.Festival import Festival
+    from db.models_generated.BeastTribe import BeastTribe
+    from db.models_generated.BeastReputationRank import BeastReputationRank
+    from db.models_generated.SatisfactionNpc import SatisfactionNpc
+    from db.models_generated.Mount import Mount
+    from db.models_generated.DeliveryQuest import DeliveryQuest
+    from db.models_generated.Level import Level
+    from db.models_generated.Behavior import Behavior
+    from db.models_generated.QuestRepeatFlag import QuestRepeatFlag
+    from db.models_generated.QuestClassJobSupply import QuestClassJobSupply
+    from db.models_generated.QuestRewardOther import QuestRewardOther
+    from db.models_generated.Item import Item
+    from db.models_generated.Stain import Stain
+    from db.models_generated.Emote import Emote
+    from db.models_generated.Action import Action
+    from db.models_generated.GeneralAction import GeneralAction
+    from db.models_generated.PlaceName import PlaceName
+    from db.models_generated.JournalGenre import JournalGenre
+    from db.models_generated.EventIconType import EventIconType
 
 
 class Quest(SQLModel, table=True):

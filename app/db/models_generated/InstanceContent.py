@@ -2,14 +2,14 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.InstanceContentType import InstanceContentType
-    from app.storingway.models_generated.BGM import BGM
-    from app.storingway.models_generated.Cutscene import Cutscene
-    from app.storingway.models_generated.Colosseum import Colosseum
-    from app.storingway.models_generated.InstanceContentTextData import InstanceContentTextData
-    from app.storingway.models_generated.BNpcBase import BNpcBase
-    from app.storingway.models_generated.InstanceContentRewardItem import InstanceContentRewardItem
-    from app.storingway.models_generated.InstanceContentBuff import InstanceContentBuff
+    from db.models_generated.InstanceContentType import InstanceContentType
+    from db.models_generated.BGM import BGM
+    from db.models_generated.Cutscene import Cutscene
+    from db.models_generated.Colosseum import Colosseum
+    from db.models_generated.InstanceContentTextData import InstanceContentTextData
+    from db.models_generated.BNpcBase import BNpcBase
+    from db.models_generated.InstanceContentRewardItem import InstanceContentRewardItem
+    from db.models_generated.InstanceContentBuff import InstanceContentBuff
 
 
 class InstanceContent(SQLModel, table=True):

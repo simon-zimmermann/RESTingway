@@ -2,12 +2,12 @@ from typing import Optional
 from sqlmodel import Field, SQLModel, Relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from app.storingway.models_generated.ClassJobCategory import ClassJobCategory
-    from app.storingway.models_generated.Item import Item
-    from app.storingway.models_generated.Town import Town
-    from app.storingway.models_generated.MonsterNote import MonsterNote
-    from app.storingway.models_generated.Action import Action
-    from app.storingway.models_generated.Quest import Quest
+    from db.models_generated.ClassJobCategory import ClassJobCategory
+    from db.models_generated.Item import Item
+    from db.models_generated.Town import Town
+    from db.models_generated.MonsterNote import MonsterNote
+    from db.models_generated.Action import Action
+    from db.models_generated.Quest import Quest
 
 
 class ClassJob(SQLModel, table=True):
